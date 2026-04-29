@@ -27,13 +27,13 @@
   --success-bg: #ECFDF5;
   --warn: #F59E0B;
   --nav-h: 72px;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 20px);
   --safe-top: env(safe-area-inset-top, 0px);
 }
 
-html, body { height: 100%; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif; color: var(--text); overscroll-behavior: none; }
+html, body { height: 100dvh; min-height: 100%; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif; color: var(--text); overscroll-behavior: none; }
 
-#app { display: flex; flex-direction: column; height: 100%; padding-top: var(--safe-top); }
+#app { display: flex; flex-direction: column; height: 100dvh; padding-top: var(--safe-top); }
 
 /* ── PANELS ─────────────────────────────────── */
 .tab-panel { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px); }

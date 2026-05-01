@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,13 +28,13 @@
   --success-bg: #ECFDF5;
   --warn: #F59E0B;
   --nav-h: 72px;
-  --safe-bottom: env(safe-area-inset-bottom, 20px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
 }
 
-html, body { height: 100dvh; min-height: 100%; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif; color: var(--text); overscroll-behavior: none; }
+html, body { height: 100%; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif; color: var(--text); overscroll-behavior: none; }
 
-#app { display: flex; flex-direction: column; height: 100dvh; padding-top: var(--safe-top); }
+#app { display: flex; flex-direction: column; height: 100%; padding-top: var(--safe-top); }
 
 /* ── PANELS ─────────────────────────────────── */
 .tab-panel { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px); }
@@ -64,11 +65,11 @@ html, body { height: 100dvh; min-height: 100%; background: var(--bg); font-famil
 .page-header {
   background: var(--grad);
   color: white;
-  padding: 20px 20px 24px;
+  padding: 20px 20px 16px;
   position: relative;
 }
-.page-header h1 { font-size: 22px; font-weight: 700; line-height: 1.2; }
-.page-header .sub { font-size: 14px; opacity: .85; margin-top: 4px; font-weight: 500; }
+.page-header h1 { font-size: 22px; font-weight: 800; line-height: 1.2; }
+.page-header .sub { font-size: 13px; opacity: .8; margin-top: 4px; font-weight: 500; }
 .page-header .phase-badge {
   display: inline-block; background: rgba(255,255,255,.25);
   border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 600;
@@ -225,9 +226,9 @@ html, body { height: 100dvh; min-height: 100%; background: var(--bg); font-famil
 .notes-textarea::placeholder { color: var(--border); }
 
 /* ── LOG TAB ─────────────────────────────────── */
-.log-header { background: var(--grad); color: white; padding: 24px 20px 20px; }
-.log-header h1 { font-size: 24px; font-weight: 800; }
-.log-header p { font-size: 14px; opacity: .8; margin-top: 4px; }
+.log-header { background: var(--grad); color: white; padding: 20px 20px 16px; }
+.log-header h1 { font-size: 22px; font-weight: 800; }
+.log-header p { font-size: 13px; opacity: .8; margin-top: 4px; }
 .log-empty { text-align: center; padding: 60px 20px; color: var(--muted); }
 .log-empty .emoji { font-size: 48px; margin-bottom: 12px; }
 .log-group { margin: 14px 16px 0; }
@@ -243,8 +244,8 @@ html, body { height: 100dvh; min-height: 100%; background: var(--bg); font-famil
 .log-weight-unit { font-size: 12px; color: var(--muted); font-weight: 500; }
 
 /* ── AI CHAT TAB ─────────────────────────────── */
-.ai-header { background: var(--grad); color: white; padding: 20px 20px 16px; display: flex; align-items: center; gap: 12px; }
-.ai-header h1 { font-size: 20px; font-weight: 800; flex: 1; }
+.ai-header { background: var(--grad); color: white; padding: 20px 20px 16px; display: flex; align-items: flex-start; gap: 12px; }
+.ai-header h1 { font-size: 22px; font-weight: 800; flex: 1; }
 .ai-settings-btn { background: rgba(255,255,255,.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
 .chat-messages {
   flex: 1; overflow-y: auto; padding: 16px;
@@ -338,9 +339,9 @@ html, body { height: 100dvh; min-height: 100%; background: var(--bg); font-famil
   <!-- ASK AI TAB -->
   <div id="tab-ai" class="tab-panel">
     <div class="ai-header">
-      <div>
+      <div style="flex:1">
         <h1>Ask AI</h1>
-        <div style="font-size:13px;opacity:.8;margin-top:2px">Your personal trainer</div>
+        <div style="font-size:13px;opacity:.8;margin-top:4px">Your personal trainer</div>
       </div>
       <button class="ai-settings-btn" onclick="openSettings()">API Key</button>
     </div>
@@ -353,6 +354,11 @@ html, body { height: 100dvh; min-height: 100%; background: var(--bg); font-famil
         </svg>
       </button>
     </div>
+  </div>
+
+  <!-- PROGRAM TAB -->
+  <div id="tab-program" class="tab-panel">
+    <div id="program-content"></div>
   </div>
 
   <!-- BOTTOM NAV -->
@@ -368,6 +374,12 @@ html, body { height: 100dvh; min-height: 100%; background: var(--bg); font-famil
         <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
       </svg>
       <span class="nav-label">Log</span>
+    </button>
+    <button class="nav-btn" id="nav-program" onclick="switchTab('program')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14" stroke-width="3"/><line x1="12" y1="14" x2="12" y2="14" stroke-width="3"/><line x1="16" y1="14" x2="16" y2="14" stroke-width="3"/>
+      </svg>
+      <span class="nav-label">Program</span>
     </button>
     <button class="nav-btn" id="nav-ai" onclick="switchTab('ai')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -670,9 +682,9 @@ function fmtTime(ts) {
 function isLiftDay(dayInfo) {
   return dayInfo && dayInfo.type === 'LIFT';
 }
-function isMonday(dateStr) {
+function isSunday(dateStr) {
   const d = new Date(dateStr + 'T12:00:00');
-  return d.getDay() === 1;
+  return d.getDay() === 0;
 }
 
 // LS helpers
@@ -697,6 +709,7 @@ function switchTab(tab) {
   document.getElementById('nav-' + tab).classList.add('active');
   activeTab = tab;
   if (tab === 'log') renderLog();
+  if (tab === 'program') renderProgram();
   if (tab === 'ai') {
     renderChat();
     setTimeout(() => document.getElementById('chat-messages').scrollTo(0, 99999), 50);
@@ -741,12 +754,12 @@ function renderToday() {
     return;
   }
 
-  // SUPPS
-  html += renderSupps(date, dayInfo, wk);
   // WORKOUT
   html += renderWorkoutSection(date, dayInfo);
   // PROTEIN
   html += renderProteinSection(date);
+  // SUPPS
+  html += renderSupps(date, dayInfo, wk);
   // NOTES
   html += renderNotesSection(date);
 
@@ -760,13 +773,13 @@ function renderToday() {
 
 function renderSupps(date, dayInfo, wk) {
   const isLift = isLiftDay(dayInfo);
-  const isMon = isMonday(date);
+  const isSun = isSunday(date);
   const dose = getRetaDose(wk);
 
   let items = [];
 
-  if (isMon && wk >= 1 && wk <= 6) {
-    items.push({ cls: 'supp-reta', name: `Reta ${dose}`, timing: 'Monday injection' });
+  if (isSun && wk >= 1 && wk <= 6) {
+    items.push({ cls: 'supp-reta', name: `Reta ${dose}`, timing: 'Sunday injection' });
   }
   if (isLift) {
     items.push({ name: 'Ipa 250mcg', timing: 'morning · 60-90 min before eating' });
@@ -774,15 +787,23 @@ function renderSupps(date, dayInfo, wk) {
   items.push({ name: 'Ipa 250mcg', timing: 'before bed · 2hr fasted minimum' });
   items.push({ name: 'Creatine 5g', timing: 'with food' });
 
-  let rows = items.map(s => `
-    <div class="supp-item ${s.cls || ''}">
-      <div class="supp-dot"></div>
+  const suppChecks = lsGet(`supp_checks_${date}`, []);
+  let rows = items.map((s, i) => {
+    const sid = `supp_${i}`;
+    const checked = suppChecks.includes(sid);
+    return `
+    <div class="supp-item ${s.cls || ''} ${checked ? 'supp-checked' : ''}" id="supp-item-${sid}">
+      <div class="ex-check ${checked ? 'checked' : ''}" id="supp-check-${sid}" onclick="toggleSupp('${date}','${sid}')" style="flex-shrink:0;margin-top:2px">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="2 7 5.5 10.5 12 3.5"/>
+        </svg>
+      </div>
       <div>
-        <div class="supp-name">${s.name}</div>
+        <div class="supp-name" style="${checked ? 'text-decoration:line-through;opacity:0.5' : ''}">${s.name}</div>
         <div class="supp-timing">${s.timing}</div>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 
   return `
     <div class="section">
@@ -1025,6 +1046,20 @@ function attachNotesHandler(date) {
   });
 }
 
+
+function toggleSupp(date, sid) {
+  const checks = lsGet(`supp_checks_${date}`, []);
+  const idx = checks.indexOf(sid);
+  if (idx === -1) checks.push(sid); else checks.splice(idx, 1);
+  lsSet(`supp_checks_${date}`, checks);
+  const checked = checks.includes(sid);
+  const checkEl = document.getElementById(`supp-check-${sid}`);
+  const itemEl = document.getElementById(`supp-item-${sid}`);
+  const nameEl = itemEl ? itemEl.querySelector('.supp-name') : null;
+  if (checkEl) checkEl.classList.toggle('checked', checked);
+  if (nameEl) nameEl.style.cssText = checked ? 'text-decoration:line-through;opacity:0.5' : '';
+}
+
 // ═══════════════════════════════════════════════
 // LOG TAB
 // ═══════════════════════════════════════════════
@@ -1089,6 +1124,169 @@ function renderLog() {
   html += '</div>';
 
   el.innerHTML = html;
+}
+
+
+// ═══════════════════════════════════════════════
+// PROGRAM TAB
+// ═══════════════════════════════════════════════
+
+// Track which program days are expanded
+let programExpanded = {};
+
+function toggleProgramDay(ds) {
+  programExpanded[ds] = !programExpanded[ds];
+  const detailEl = document.getElementById('prog-detail-' + ds);
+  const chevEl   = document.getElementById('prog-chev-' + ds);
+  if (!detailEl) return;
+  detailEl.style.display = programExpanded[ds] ? 'block' : 'none';
+  if (chevEl) chevEl.style.transform = programExpanded[ds] ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+function renderProgram() {
+  const el = document.getElementById('program-content');
+  const today = todayStr();
+
+  const TYPE_STYLE = {
+    LIFT:   { bg: '#FFF8EC', border: '#F59E0B', label: '#92400E', dot: '#F59E0B' },
+    HOTWORX:{ bg: '#FFF1F2', border: '#F87171', label: '#991B1B', dot: '#F87171' },
+    REST:   { bg: '#F0F9FF', border: '#7DD3FC', label: '#075985', dot: '#7DD3FC' },
+    TAPER:  { bg: '#F5F3FF', border: '#A78BFA', label: '#5B21B6', dot: '#A78BFA' },
+  };
+
+  const allDays = [];
+  const start = new Date('2026-05-01T12:00:00');
+  const end   = new Date('2026-06-14T12:00:00');
+  for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+    const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    allDays.push(ds);
+  }
+
+  const weeks = [];
+  let currentWeek = [];
+  let currentWkNum = null;
+  allDays.forEach(ds => {
+    const wk = weekNum(ds);
+    const wkLabel = wk < 1 ? 'Ramp-In' : `Week ${wk}`;
+    if (wkLabel !== currentWkNum) {
+      if (currentWeek.length) weeks.push({ label: currentWkNum, days: currentWeek });
+      currentWeek = [];
+      currentWkNum = wkLabel;
+    }
+    currentWeek.push(ds);
+  });
+  if (currentWeek.length) weeks.push({ label: currentWkNum, days: currentWeek });
+
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  let html = `
+    <div style="background:var(--grad);color:white;padding:20px 20px 16px">
+      <h1 style="font-size:22px;font-weight:800">Full Program</h1>
+      <p style="font-size:13px;opacity:.8;margin-top:4px">May 1 – June 13 · Tap lift days to see exercises</p>
+    </div>
+  `;
+
+  weeks.forEach(week => {
+    const wkNum = weekNum(week.days[0]);
+    const phaseLabel = wkNum < 1 ? 'Ramp-In' :
+      wkNum <= 2 ? 'Re-activation' :
+      wkNum === 3 ? 'Intensification' :
+      wkNum === 4 ? 'Deload' : 'Peak Phase';
+
+    html += `<div style="margin:14px 16px 0">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">
+        ${week.label}${wkNum >= 1 ? ' · ' + phaseLabel : ''}
+      </div>`;
+
+    week.days.forEach(ds => {
+      const info = getDayInfo(ds);
+      const d = new Date(ds + 'T12:00:00');
+      const dayName = dayNames[d.getDay()];
+      const isToday = (ds === today);
+      const isPast  = (ds < today);
+      const isLift  = info && info.type === 'LIFT';
+
+      let type = info ? info.type : 'REST';
+      let label = info
+        ? (info.type === 'LIFT' ? info.workout.name : info.name || 'Rest Day')
+        : 'Rest Day';
+
+      const style = TYPE_STYLE[type] || TYPE_STYLE.REST;
+      const isExpanded = !!programExpanded[ds];
+
+      // Build exercise detail HTML for lift days
+      let detailHtml = '';
+      if (isLift) {
+        const exes = info.workout.exercises;
+        const hasWarmup = info.showWarmup;
+        let rows = '';
+        if (hasWarmup) {
+          rows += `<div style="font-size:11px;color:#92400E;background:#FEF3C7;border-radius:6px;padding:6px 8px;margin-bottom:6px">🏃‍♀️ ${WARMUP}</div>`;
+        }
+        exes.forEach(ex => {
+          const isAb    = ex.isAb;
+          const isGlute = ex.isGlute;
+          const tag = isAb ? ' · AB' : isGlute ? ' · GLUTE' : '';
+          rows += `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #F1F5F9">
+            <div style="font-size:12px;color:var(--text);font-weight:500;flex:1;padding-right:8px">${ex.name}${ex.note ? '<br><span style=\'font-size:10px;color:var(--warn)\'>★ ' + ex.note + '</span>' : ''}</div>
+            <div style="font-size:11px;color:${style.label};font-weight:700;white-space:nowrap">${ex.sets}${tag}</div>
+          </div>`;
+        });
+        detailHtml = `
+          <div id="prog-detail-${ds}" style="display:${isExpanded ? 'block' : 'none'};padding:8px 0 4px;border-top:1px solid ${style.border}">
+            ${rows}
+          </div>`;
+      }
+
+      html += `
+        <div style="
+          margin-bottom:6px;
+          background:${isToday ? style.bg : isPast ? '#F8FAFC' : '#FAFAF8'};
+          border:1.5px solid ${isToday ? style.border : '#E2E8F0'};
+          border-radius:12px;
+          overflow:hidden;
+          opacity:${isPast ? '0.65' : '1'};
+          ${isToday ? 'box-shadow:0 2px 8px rgba(0,0,0,0.08)' : ''}
+        ">
+          <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:${isLift ? 'pointer' : 'default'}"
+            ${isLift ? `onclick="toggleProgramDay('${ds}')"` : ''}>
+            <div style="text-align:center;min-width:36px">
+              <div style="font-size:11px;font-weight:700;color:${isToday ? style.label : 'var(--muted)'}">${dayName}</div>
+              <div style="font-size:13px;font-weight:600;color:${isToday ? style.label : 'var(--text)'}">${d.getDate()}</div>
+            </div>
+            <div style="width:6px;height:6px;border-radius:50%;background:${isToday ? style.dot : '#CBD5E1'};flex-shrink:0"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:${isToday ? '700' : '500'};color:${isToday ? style.label : isPast ? 'var(--muted)' : 'var(--text)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                ${isToday ? '▶ ' : ''}${label}
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">${type}${isToday ? ' · TODAY' : ''}${isLift ? ' · tap to expand' : ''}</div>
+            </div>
+            ${isLift ? `<div id="prog-chev-${ds}" style="font-size:14px;color:${style.label};transition:transform .2s;transform:${isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'};flex-shrink:0">⌄</div>` : ''}
+          </div>
+          ${isLift ? `<div style="padding:0 14px">${detailHtml}</div>` : ''}
+        </div>`;
+    });
+
+    html += '</div>';
+  });
+
+  html += '<div style="height:16px"></div>';
+  el.innerHTML = html;
+
+  // Auto-expand today if it is a lift day
+  if (!programExpanded[today]) {
+    const todayInfo = getDayInfo(today);
+    if (todayInfo && todayInfo.type === 'LIFT') {
+      programExpanded[today] = true;
+    }
+  }
+
+  // Scroll to today
+  setTimeout(() => {
+    const allCards = el.querySelectorAll('[style*="box-shadow"]');
+    if (allCards.length) allCards[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 80);
 }
 
 // ═══════════════════════════════════════════════

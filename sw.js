@@ -1,4 +1,4 @@
-const CACHE = 'meg-fit-v2';
+const CACHE = 'meg-fit-v3';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {

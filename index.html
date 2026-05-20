@@ -407,6 +407,31 @@ html, body { height: 100%; background: var(--bg); font-family: -apple-system, Bl
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 @keyframes fadeOut { to { opacity: 0; } }
+
+/* ── CHAT DATE SEPARATOR ─────────────────────── */
+.chat-date-sep {
+  text-align: center; font-size: 11px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .5px;
+  margin: 8px 0; position: relative;
+}
+.chat-date-sep::before, .chat-date-sep::after {
+  content: ''; position: absolute; top: 50%; width: 30%; height: 1px; background: var(--border);
+}
+.chat-date-sep::before { left: 0; }
+.chat-date-sep::after { right: 0; }
+
+/* ── LOG PROGRESSION ─────────────────────────── */
+.log-progression { font-size: 11px; color: var(--primary); margin-top: 2px; font-weight: 600; }
+
+/* ── SETTINGS DATA SECTION ───────────────────── */
+.settings-divider { height: 1px; background: var(--border); margin: 20px 0; }
+.import-area {
+  width: 100%; border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 10px 14px; font-size: 12px; font-family: monospace; color: var(--text);
+  outline: none; background: var(--card); margin-bottom: 12px;
+  min-height: 72px; resize: vertical;
+}
+.import-area:focus { border-color: var(--primary); }
 </style>
 </head>
 <body>
@@ -486,6 +511,12 @@ html, body { height: 100%; background: var(--bg); font-family: -apple-system, Bl
     <input type="password" id="api-key-input" class="api-input" placeholder="sk-ant-..." />
     <button class="btn-primary" onclick="saveApiKey()">Save Key</button>
     <button class="btn-secondary" onclick="closeSettings()">Cancel</button>
+    <div class="settings-divider"></div>
+    <div class="field-label">Data Backup</div>
+    <button class="btn-secondary" style="border:1.5px solid var(--border);border-radius:12px;height:44px;color:var(--text);width:100%;margin-bottom:16px" onclick="exportData()">Export All Data</button>
+    <div class="field-label">Restore from Backup</div>
+    <textarea id="import-area" class="import-area" placeholder="Paste backup JSON here…"></textarea>
+    <button class="btn-primary" onclick="importData()">Restore Data</button>
   </div>
 </div>
 
@@ -1030,6 +1061,31 @@ function attachWorkoutHandlers(date, dayInfo) {
   });
 }
 
+// ── EXERCISE OVERRIDES ────────────────────────
+
+function getExerciseOverrides() {
+  return lsGet('exercise_overrides', {});
+}
+
+function applyOverrides(workout, splitKey) {
+  const ov = getExerciseOverrides()[splitKey];
+  if (!ov) return workout;
+  let exercises = workout.exercises.filter(e => !(ov.remove || []).includes(e.id));
+  exercises = [...exercises, ...(ov.add || [])];
+  return { ...workout, exercises };
+}
+
+function getAllNameMap() {
+  const map = {};
+  [W.GH_BASE, W.GH_DELOAD, W.GH_PEAK, W.SB_BASE, W.SB_DELOAD, W.SB_PEAK,
+   W.QA_BASE, W.QA_DELOAD, W.QA_PEAK, W.AC_BASE, W.AC_DELOAD, W.AC_PEAK, W.RAMP_IN]
+    .forEach(w => w.exercises.forEach(e => { map[e.id] = e.name; }));
+  lsGet('loaded_programs', []).forEach(prog =>
+    Object.values(prog.workouts).forEach(w => w.exercises.forEach(e => { map[e.id] = e.name; }))
+  );
+  return map;
+}
+
 // ── WEEKLY WORKOUTS ───────────────────────────
 
 function getWeekWorkouts(wk) {
@@ -1067,6 +1123,7 @@ function renderExerciseRow(ex, checks, wkey) {
 }
 
 function renderWorkoutAccordionItem(key, workout, weekId, weekNote) {
+  workout = applyOverrides(workout, key);
   const storageKey = `checks_${weekId}_${key}`;
   const checks = lsGet(storageKey, []);
   const total = workout.exercises.length;
@@ -1182,7 +1239,16 @@ function attachWeeklyWorkoutHandlers(weekId) {
       clearTimeout(debounceTimers[id]);
       debounceTimers[id] = setTimeout(() => {
         const val = input.value.trim();
-        if (val !== '') lsSet(`weight_${id}`, { weight: val, updatedAt: todayStr() });
+        if (val !== '') {
+          lsSet(`weight_${id}`, { weight: val, updatedAt: todayStr() });
+          const wk = weekNum(todayStr());
+          const hist = lsGet('wt_history', {});
+          if (!hist[id]) hist[id] = [];
+          const existingIdx = hist[id].findIndex(h => h.wk === wk);
+          const entry = { wk, weight: val, date: todayStr() };
+          if (existingIdx >= 0) hist[id][existingIdx] = entry; else hist[id].push(entry);
+          lsSet('wt_history', hist);
+        }
       }, 600);
     });
   });
@@ -1490,17 +1556,22 @@ function renderLog() {
 }
 
 function renderLogGroup(label, exercises, knownIds) {
+  const wtHistory = lsGet('wt_history', {});
   let html = `<div class="log-group"><div class="log-group-title">${label}</div>`;
   exercises.forEach(ex => {
     const w = lsGet(`weight_${ex.id}`, {});
     const dateLabel = w.updatedAt ? fmtDate(w.updatedAt) : null;
+    const hist = (wtHistory[ex.id] || []).slice().sort((a, b) => a.wk - b.wk);
+    const progression = hist.length > 1 ? hist.map(h => `W${h.wk}: ${h.weight}`).join(' → ') : null;
     html += `
       <div class="log-item">
-        <div>
+        <div style="flex:1;min-width:0">
           <div class="log-ex-name">${ex.name || ex.id.replace(/_/g,' ')}</div>
-          <div class="log-ex-date" ${!dateLabel ? 'style="color:var(--border)"' : ''}>${dateLabel || 'not logged yet'}</div>
+          ${progression
+            ? `<div class="log-progression">${progression}</div>`
+            : `<div class="log-ex-date" ${!dateLabel ? 'style="color:var(--border)"' : ''}>${dateLabel || 'not logged yet'}</div>`}
         </div>
-        <div style="text-align:right">
+        <div style="text-align:right;flex-shrink:0;margin-left:10px">
           ${w.weight
             ? `<div class="log-weight-val">${w.weight}</div><div class="log-weight-unit">lbs</div>`
             : `<div class="log-weight-val" style="color:var(--border)">—</div>`}
@@ -1515,7 +1586,7 @@ function renderLogGroup(label, exercises, knownIds) {
 // AI CHAT TAB
 // ═══════════════════════════════════════════════
 
-const SYSTEM_PROMPT = `You are a personal trainer and wellness coach for Meg. Be direct and concise — no fluff, no pleasantries. Like a smart trainer who knows her well.
+const SYSTEM_PROMPT_BASE = `You are a personal trainer and wellness coach for Meg. Be direct and concise — no fluff, no pleasantries. Like a smart trainer who knows her well.
 
 PROFILE:
 - 130 lbs, ongoing structured training program (Phase 1: May 1 – June 13, 2026)
@@ -1588,29 +1659,111 @@ Rules for program JSON:
 - Include all 4 splits (GH/SB/QA/AC) with all phase variants referenced in weekPhases
 - Exercise objects: {id, name, sets, isAb (optional bool), isGlute (optional bool), note (optional string)}
 - Wrist constraint: NO push-ups, flat bench, dips, dorsiflexed wrist under load
-- Neutral grip only. Triceps: rope pushdowns and OH extension only.`;
+- Neutral grip only. Triceps: rope pushdowns and OH extension only.
 
-function getChatHistory(date) {
-  return lsGet(`chat_${date}`, []);
+MODIFYING EXERCISES:
+When Meg wants to swap, add, or remove an exercise, output a structured patch block. The app detects it and shows a one-tap "Apply" button — no manual editing needed.
+
+\`\`\`program-patch
+{
+  "description": "Short human-readable summary of the change",
+  "changes": [
+    {
+      "type": "swap",
+      "split": "AC",
+      "remove_id": "banded_clamshell",
+      "add": {"id": "unique_snake_case_id", "name": "Cable Hip Abduction", "sets": "3×20ea", "isGlute": true}
+    }
+  ]
 }
-function saveChatHistory(date, msgs) {
-  lsSet(`chat_${date}`, msgs);
+\`\`\`
+
+Change types: "swap" (replace one with another), "add" (add new), "remove" (remove only).
+Split keys: GH, SB, QA, AC. Change applies across all phases of that split.
+Exercise object fields: id (unique string), name, sets, isAb (bool), isGlute (bool), note (string).
+Always use a fresh unique id — never reuse an existing exercise id.`;
+
+function buildSystemPrompt() {
+  const today = todayStr();
+  const wk = weekNum(today);
+  const nameMap = getAllNameMap();
+  let prompt = SYSTEM_PROMPT_BASE;
+
+  // Current week exercise lists with overrides
+  if (wk >= 1 && wk <= 6) {
+    prompt += `\n\nCURRENT WEEK EXERCISES (Week ${wk}):`;
+    getWeekWorkouts(wk).forEach(({key, workout}) => {
+      const w = applyOverrides(workout, key);
+      prompt += `\n\n${w.name}:`;
+      w.exercises.forEach(e => {
+        let line = `\n  • ${e.name} — ${e.sets}`;
+        if (e.isAb) line += ' [AB]';
+        if (e.isGlute) line += ' [GLUTE]';
+        if (e.note) line += ` ★ ${e.note}`;
+        prompt += line;
+      });
+    });
+  }
+
+  // Logged weights with progression history
+  const wtHistory = lsGet('wt_history', {});
+  const weightLines = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('weight_')) {
+      const id = k.slice(7);
+      const data = lsGet(k, {});
+      if (data.weight) {
+        const name = nameMap[id] || id;
+        const hist = (wtHistory[id] || []).slice().sort((a, b) => a.wk - b.wk);
+        const progStr = hist.length > 1 ? ' (' + hist.map(h => `W${h.wk}: ${h.weight}`).join(' → ') + ')' : '';
+        weightLines.push(`  ${name}: ${data.weight} lbs${progStr}`);
+      }
+    }
+  }
+  if (weightLines.length) prompt += '\n\nLOGGED WEIGHTS:\n' + weightLines.join('\n');
+
+  // This week's workout completion
+  if (wk >= 1 && wk <= 6) {
+    const lines = getWeekWorkouts(wk).map(({key, workout}) => {
+      const w = applyOverrides(workout, key);
+      const checks = lsGet(`checks_w${wk}_${key}`, []);
+      const done = checks.filter(id => w.exercises.some(e => e.id === id)).length;
+      return `  ${w.name}: ${done}/${w.exercises.length} done`;
+    });
+    prompt += `\n\nTHIS WEEK'S PROGRESS:\n` + lines.join('\n');
+  }
+
+  // Today's protein
+  const protein = lsGet(`protein_${today}`, { total: 0 });
+  prompt += `\n\nTODAY'S PROTEIN: ${protein.total}g / 130g target`;
+
+  return prompt;
+}
+
+function getChatHistory() {
+  return lsGet('chat_history', []);
+}
+function saveChatHistory(msgs) {
+  lsSet('chat_history', msgs.slice(-200));
 }
 
 function formatChatContent(content) {
-  // Replace program-json blocks with a tidy preview card (hide raw JSON)
   let result = '';
   let lastIndex = 0;
-  const re = /```program-json\n([\s\S]*?)```/g;
+  const re = /```(program-json|program-patch)\n([\s\S]*?)```/g;
   let m;
   while ((m = re.exec(content)) !== null) {
     result += escHtml(content.slice(lastIndex, m.index));
     try {
-      const p = JSON.parse(m[1]);
-      result += `<span class="program-preview-card"><strong>${escHtml(p.name || 'New Program')}</strong><br><span style="font-size:12px;color:var(--muted)">${escHtml(p.start)} → ${escHtml(p.end)}</span></span>`;
-    } catch(e) {
-      result += escHtml(m[0]);
-    }
+      const p = JSON.parse(m[2]);
+      if (m[1] === 'program-json') {
+        result += `<span class="program-preview-card"><strong>${escHtml(p.name || 'New Program')}</strong><br><span style="font-size:12px;color:var(--muted)">${escHtml(p.start)} → ${escHtml(p.end)}</span></span>`;
+      } else {
+        const n = (p.changes || []).length;
+        result += `<span class="program-preview-card">✏️ <strong>${escHtml(p.description || 'Exercise change')}</strong><br><span style="font-size:12px;color:var(--muted)">${n} change${n !== 1 ? 's' : ''}</span></span>`;
+      }
+    } catch(e) { result += escHtml(m[0]); }
     lastIndex = m.index + m[0].length;
   }
   result += escHtml(content.slice(lastIndex));
@@ -1618,8 +1771,7 @@ function formatChatContent(content) {
 }
 
 function renderChat() {
-  const date = todayStr();
-  const msgs = getChatHistory(date);
+  const msgs = getChatHistory();
   const el = document.getElementById('chat-messages');
   if (!el) return;
 
@@ -1632,8 +1784,21 @@ function renderChat() {
   }
 
   const loadedPrograms = lsGet('loaded_programs', []);
+  const appliedPatches = lsGet('applied_patches', []);
+  let lastDateStr = null;
 
   el.innerHTML = msgs.map((m, idx) => {
+    // Date separator
+    const msgDate = m.ts ? new Date(m.ts) : null;
+    const msgDateStr = msgDate ? msgDate.toDateString() : null;
+    let dateSep = '';
+    if (msgDateStr && msgDateStr !== lastDateStr) {
+      lastDateStr = msgDateStr;
+      const isToday = msgDateStr === new Date().toDateString();
+      const label = isToday ? 'Today' : fmtDate(new Date(m.ts).toISOString().slice(0, 10));
+      dateSep = `<div class="chat-date-sep">${label}</div>`;
+    }
+
     let extra = '';
     if (m.role === 'assistant') {
       const progMatch = m.content.match(/```program-json\n([\s\S]*?)```/);
@@ -1642,25 +1807,26 @@ function renderChat() {
           const parsed = JSON.parse(progMatch[1]);
           if (parsed.version === 1 && parsed.name && parsed.start) {
             const alreadyLoaded = loadedPrograms.some(p => p.start === parsed.start && p.name === parsed.name);
-            extra = `<button class="program-load-btn" ${alreadyLoaded ? 'disabled' : ''} onclick="loadProgram(${idx}, this)">
-              ${alreadyLoaded ? '✓ Loaded' : `Load "${escHtml(parsed.name)}" →`}
-            </button>`;
+            extra = `<button class="program-load-btn" ${alreadyLoaded ? 'disabled' : ''} onclick="loadProgram(${idx}, this)">${alreadyLoaded ? '✓ Loaded' : `Load "${escHtml(parsed.name)}" →`}</button>`;
           }
         } catch(e) {}
       }
+      const patchMatch = m.content.match(/```program-patch\n([\s\S]*?)```/);
+      if (patchMatch) {
+        try {
+          const parsed = JSON.parse(patchMatch[1]);
+          const patchKey = `patch_${parsed.description}`;
+          const alreadyApplied = appliedPatches.includes(patchKey);
+          extra = `<button class="program-load-btn" ${alreadyApplied ? 'disabled' : ''} onclick="applyProgramPatch(${idx}, this)">${alreadyApplied ? '✓ Applied' : 'Apply this change →'}</button>`;
+        } catch(e) {}
+      }
     }
-    return `
-      <div class="msg ${m.role}">
-        <div class="msg-bubble">${formatChatContent(m.content)}</div>
-        ${extra}
-        ${m.ts ? `<div class="msg-time">${fmtTime(m.ts)}</div>` : ''}
-      </div>`;
+    return `${dateSep}<div class="msg ${m.role}"><div class="msg-bubble">${formatChatContent(m.content)}</div>${extra}${m.ts ? `<div class="msg-time">${fmtTime(m.ts)}</div>` : ''}</div>`;
   }).join('');
 }
 
 function loadProgram(msgIdx, btn) {
-  const date = todayStr();
-  const msgs = getChatHistory(date);
+  const msgs = getChatHistory();
   const msg = msgs[msgIdx];
   if (!msg) return;
   const progMatch = msg.content.match(/```program-json\n([\s\S]*?)```/);
@@ -1677,6 +1843,77 @@ function loadProgram(msgIdx, btn) {
     showToast(`"${parsed.name}" loaded ✓`);
   } catch(e) {
     showToast('Error loading program');
+  }
+}
+
+function applyProgramPatch(msgIdx, btn) {
+  const msgs = getChatHistory();
+  const msg = msgs[msgIdx];
+  if (!msg) return;
+  const patchMatch = msg.content.match(/```program-patch\n([\s\S]*?)```/);
+  if (!patchMatch) return;
+  try {
+    const patch = JSON.parse(patchMatch[1]);
+    const overrides = lsGet('exercise_overrides', {});
+    (patch.changes || []).forEach(change => {
+      const split = change.split;
+      if (!overrides[split]) overrides[split] = { remove: [], add: [] };
+      if ((change.type === 'swap' || change.type === 'remove') && change.remove_id) {
+        if (!overrides[split].remove.includes(change.remove_id)) overrides[split].remove.push(change.remove_id);
+      }
+      if ((change.type === 'swap' || change.type === 'add') && change.add) {
+        overrides[split].add = overrides[split].add.filter(e => e.id !== change.add.id);
+        overrides[split].add.push(change.add);
+      }
+    });
+    lsSet('exercise_overrides', overrides);
+    const patchKey = `patch_${patch.description}`;
+    const applied = lsGet('applied_patches', []);
+    if (!applied.includes(patchKey)) { applied.push(patchKey); lsSet('applied_patches', applied); }
+    btn.disabled = true;
+    btn.textContent = '✓ Applied';
+    showToast('Change applied ✓');
+    if (document.getElementById('tab-today').classList.contains('active')) renderToday();
+  } catch(e) {
+    showToast('Error applying change');
+  }
+}
+
+function exportData() {
+  const data = { _exported: new Date().toISOString(), _version: 2 };
+  const always = ['exercise_overrides', 'loaded_programs', 'applied_patches', 'chat_history', 'wt_history', 'anthropic_api_key'];
+  always.forEach(k => { const v = lsGet(k, null); if (v !== null) data[k] = v; });
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && (k.startsWith('weight_') || k.startsWith('protein_') || k.startsWith('checks_'))) {
+      data[k] = lsGet(k, null);
+    }
+  }
+  const json = JSON.stringify(data, null, 2);
+  const file = new File([json], 'meg-fit-backup.json', { type: 'application/json' });
+  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({ files: [file], title: 'Meg Fit Backup' }).catch(() => fallbackCopy(json));
+  } else {
+    fallbackCopy(json);
+  }
+}
+
+function fallbackCopy(text) {
+  navigator.clipboard?.writeText(text).then(() => showToast('Copied to clipboard ✓')).catch(() => showToast('Could not copy'));
+}
+
+function importData() {
+  const text = document.getElementById('import-area')?.value.trim();
+  if (!text) { showToast('Paste your backup JSON first'); return; }
+  try {
+    const data = JSON.parse(text);
+    const { _exported, _version, ...entries } = data;
+    Object.entries(entries).forEach(([k, v]) => lsSet(k, v));
+    showToast('Data restored ✓');
+    closeSettings();
+    renderToday();
+  } catch(e) {
+    showToast('Invalid backup — check the JSON');
   }
 }
 
@@ -1719,10 +1956,9 @@ async function sendChat() {
     return;
   }
 
-  const date = todayStr();
-  const msgs = getChatHistory(date);
+  const msgs = getChatHistory();
   msgs.push({ role: 'user', content: text, ts: Date.now() });
-  saveChatHistory(date, msgs);
+  saveChatHistory(msgs);
 
   input.value = '';
   input.style.height = 'auto';
@@ -1744,7 +1980,7 @@ async function sendChat() {
   chatEl.scrollTo(0, chatEl.scrollHeight);
 
   try {
-    const apiMsgs = msgs.slice(-20).map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content }));
+    const apiMsgs = msgs.slice(-30).map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content }));
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -1757,7 +1993,7 @@ async function sendChat() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1024,
-        system: SYSTEM_PROMPT,
+        system: buildSystemPrompt(),
         messages: apiMsgs,
       }),
     });
@@ -1769,7 +2005,7 @@ async function sendChat() {
 
     const reply = data.content[0].text;
     msgs.push({ role: 'assistant', content: reply, ts: Date.now() });
-    saveChatHistory(date, msgs);
+    saveChatHistory(msgs);
     renderChat();
     chatEl.scrollTo(0, chatEl.scrollHeight);
   } catch (err) {

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,11 +64,11 @@ html, body { height: 100%; background: var(--bg); font-family: -apple-system, Bl
 .page-header {
   background: var(--grad);
   color: white;
-  padding: 20px 20px 16px;
+  padding: 20px 20px 24px;
   position: relative;
 }
-.page-header h1 { font-size: 22px; font-weight: 800; line-height: 1.2; }
-.page-header .sub { font-size: 13px; opacity: .8; margin-top: 4px; font-weight: 500; }
+.page-header h1 { font-size: 22px; font-weight: 700; line-height: 1.2; }
+.page-header .sub { font-size: 14px; opacity: .85; margin-top: 4px; font-weight: 500; }
 .page-header .phase-badge {
   display: inline-block; background: rgba(255,255,255,.25);
   border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 600;
@@ -226,9 +225,9 @@ html, body { height: 100%; background: var(--bg); font-family: -apple-system, Bl
 .notes-textarea::placeholder { color: var(--border); }
 
 /* ── LOG TAB ─────────────────────────────────── */
-.log-header { background: var(--grad); color: white; padding: 20px 20px 16px; }
-.log-header h1 { font-size: 22px; font-weight: 800; }
-.log-header p { font-size: 13px; opacity: .8; margin-top: 4px; }
+.log-header { background: var(--grad); color: white; padding: 24px 20px 20px; }
+.log-header h1 { font-size: 24px; font-weight: 800; }
+.log-header p { font-size: 14px; opacity: .8; margin-top: 4px; }
 .log-empty { text-align: center; padding: 60px 20px; color: var(--muted); }
 .log-empty .emoji { font-size: 48px; margin-bottom: 12px; }
 .log-group { margin: 14px 16px 0; }
@@ -244,8 +243,8 @@ html, body { height: 100%; background: var(--bg); font-family: -apple-system, Bl
 .log-weight-unit { font-size: 12px; color: var(--muted); font-weight: 500; }
 
 /* ── AI CHAT TAB ─────────────────────────────── */
-.ai-header { background: var(--grad); color: white; padding: 20px 20px 16px; display: flex; align-items: flex-start; gap: 12px; }
-.ai-header h1 { font-size: 22px; font-weight: 800; flex: 1; }
+.ai-header { background: var(--grad); color: white; padding: 20px 20px 16px; display: flex; align-items: center; gap: 12px; }
+.ai-header h1 { font-size: 20px; font-weight: 800; flex: 1; }
 .ai-settings-btn { background: rgba(255,255,255,.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
 .chat-messages {
   flex: 1; overflow-y: auto; padding: 16px;
@@ -321,6 +320,93 @@ html, body { height: 100%; background: var(--bg); font-family: -apple-system, Bl
 }
 
 .no-workout { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 15px; }
+
+/* ── PROGRAM TAB ─────────────────────────────── */
+.program-header { background: var(--grad); color: white; padding: 24px 20px 20px; }
+.program-header h1 { font-size: 24px; font-weight: 800; }
+.program-header p { font-size: 14px; opacity: .8; margin-top: 4px; }
+.prog-week-header {
+  font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase;
+  letter-spacing: .8px; padding: 16px 16px 6px;
+}
+.prog-day-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px; border-bottom: 1px solid var(--border); background: white;
+}
+.prog-day-row[onclick] { cursor: pointer; }
+.prog-day-row[onclick]:active { background: var(--card); }
+.prog-day-row.past { opacity: .45; }
+.prog-day-row.today { background: #FFF8F0; border-left: 3px solid var(--primary); }
+.prog-day-row.expanded .prog-chevron { transform: rotate(180deg); }
+.prog-day-left { display: flex; flex-direction: column; align-items: center; min-width: 38px; flex-shrink: 0; }
+.prog-day-name { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; }
+.prog-day-num { font-size: 20px; font-weight: 800; line-height: 1.1; }
+.prog-today-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--primary); margin-top: 3px; }
+.prog-day-info { flex: 1; min-width: 0; }
+.prog-day-workout-name { font-size: 14px; font-weight: 700; }
+.prog-day-meta { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 500; }
+.prog-chevron { width: 16px; height: 16px; color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+.prog-day-detail { display: none; padding: 8px 16px 14px 68px; border-bottom: 1px solid var(--border); background: var(--card); }
+.prog-day-detail.open { display: block; }
+.prog-ex-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.prog-ex-row:last-child { border-bottom: none; }
+.prog-ex-name { color: var(--text); font-weight: 500; }
+.prog-ex-tag { font-size: 10px; font-weight: 700; color: var(--muted); background: var(--border); padding: 1px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
+.prog-ex-sets { color: var(--primary); font-weight: 700; flex-shrink: 0; margin-left: 10px; }
+.prog-future-block { margin: 8px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.prog-future-name { font-size: 15px; font-weight: 700; }
+.prog-future-dates { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+/* ── WEEKLY WORKOUT ACCORDION ────────────────── */
+.workout-accordion-item { border-bottom: 1px solid var(--border); }
+.workout-accordion-item:last-child { border-bottom: none; }
+.workout-accordion-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; cursor: pointer; background: #fff; user-select: none;
+  -webkit-user-select: none;
+}
+.workout-accordion-header:active { background: var(--card); }
+.workout-accordion-name { font-size: 15px; font-weight: 700; }
+.workout-accordion-meta { display: flex; align-items: center; gap: 8px; }
+.workout-completion {
+  font-size: 12px; font-weight: 700; color: var(--primary);
+  background: var(--success-bg); padding: 2px 8px; border-radius: 20px;
+}
+.accordion-chevron { width: 18px; height: 18px; color: var(--muted); transition: transform .2s; }
+.workout-accordion-item.open .accordion-chevron { transform: rotate(180deg); }
+.workout-accordion-body { display: none; padding: 4px 16px 16px; }
+.workout-accordion-item.open .workout-accordion-body { display: block; }
+
+/* ── PROGRAM LOAD BUTTON + PREVIEW ──────────── */
+.program-load-btn {
+  display: inline-block; margin-top: 10px;
+  background: var(--grad); color: white; border: none;
+  padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: opacity .2s;
+}
+.program-load-btn:disabled { opacity: .5; cursor: default; }
+.program-load-btn:active:not(:disabled) { opacity: .85; }
+.program-preview-card {
+  display: block; background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px; margin: 6px 0; font-size: 13px;
+}
+
+/* ── TOAST ───────────────────────────────────── */
+.toast {
+  position: fixed; bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+  left: 50%; transform: translateX(-50%);
+  background: var(--text); color: white; padding: 10px 20px; border-radius: 20px;
+  font-size: 14px; font-weight: 600; z-index: 300; white-space: nowrap;
+  animation: fadeInUp .3s ease, fadeOut .3s ease 1.7s forwards;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes fadeOut { to { opacity: 0; } }
 </style>
 </head>
 <body>
@@ -336,12 +422,17 @@ html, body { height: 100%; background: var(--bg); font-family: -apple-system, Bl
     <div id="log-content"></div>
   </div>
 
+  <!-- PROGRAM TAB -->
+  <div id="tab-program" class="tab-panel">
+    <div id="program-content"></div>
+  </div>
+
   <!-- ASK AI TAB -->
   <div id="tab-ai" class="tab-panel">
     <div class="ai-header">
-      <div style="flex:1">
+      <div>
         <h1>Ask AI</h1>
-        <div style="font-size:13px;opacity:.8;margin-top:4px">Your personal trainer</div>
+        <div style="font-size:13px;opacity:.8;margin-top:2px">Your personal trainer</div>
       </div>
       <button class="ai-settings-btn" onclick="openSettings()">API Key</button>
     </div>
@@ -354,11 +445,6 @@ html, body { height: 100%; background: var(--bg); font-family: -apple-system, Bl
         </svg>
       </button>
     </div>
-  </div>
-
-  <!-- PROGRAM TAB -->
-  <div id="tab-program" class="tab-panel">
-    <div id="program-content"></div>
   </div>
 
   <!-- BOTTOM NAV -->
@@ -377,7 +463,7 @@ html, body { height: 100%; background: var(--bg); font-family: -apple-system, Bl
     </button>
     <button class="nav-btn" id="nav-program" onclick="switchTab('program')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14" stroke-width="3"/><line x1="12" y1="14" x2="12" y2="14" stroke-width="3"/><line x1="16" y1="14" x2="16" y2="14" stroke-width="3"/>
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="7" y1="15" x2="9" y2="15"/><line x1="7" y1="19" x2="9" y2="19"/><line x1="13" y1="15" x2="17" y2="15"/><line x1="13" y1="19" x2="17" y2="19"/>
       </svg>
       <span class="nav-label">Program</span>
     </button>
@@ -585,7 +671,7 @@ const W = {
 const PROGRAM_START = new Date('2026-05-04T12:00:00');
 const SPECIAL = {
   '2026-05-01': { type:'LIFT', workout: W.RAMP_IN, showWarmup: true },
-  '2026-05-02': { type:'HOTWORX', name:'Hot Yoga / Hot ISO', desc:'Hot yoga or hot ISO — 30 min · Replenish electrolytes', emoji:'🔥' },
+  '2026-05-02': { type:'REST', name:'Rest Day', desc:'Full rest · Eat well, hit protein target, sleep', emoji:'💤' },
   '2026-05-03': { type:'REST', name:'Rest Day', desc:'Full rest · Eat well, hit protein target, sleep', emoji:'💤' },
   '2026-06-12': { type:'TAPER', name:'Taper Rest', desc:'Taper rest — no lifting, no HIIT. Arrive at your honeymoon feeling fresh.', emoji:'🤍' },
   '2026-06-13': { type:'TAPER', name:'Taper Rest', desc:'Taper rest — no lifting, no HIIT. Arrive at your honeymoon feeling fresh.', emoji:'🤍' },
@@ -619,20 +705,11 @@ function getDayInfo(dateStr) {
   // Sunday: REST
   if (dow === 0) return { type:'REST', name:'Rest Day', desc:'Easy walk optional · Infrared sauna optional · Real recovery', emoji:'💤' };
 
-  // Saturday: HOTWORX (all weeks)
-  if (dow === 6) {
-    const desc = (wk >= 5)
-      ? 'Hot HIIT — 30-40 min · Max effort · Force protein post-session'
-      : 'Hot HIIT — 30-40 min · Force protein within 30 min post-session · Replenish electrolytes';
-    return { type:'HOTWORX', name:'Hot HIIT', desc, emoji:'🔥' };
-  }
+  // Saturday: REST (Hotworx membership cancelled)
+  if (dow === 6) return { type:'REST', name:'Rest Day', desc:'Full rest · Easy walk optional · Infrared sauna optional', emoji:'💤' };
 
-  // Tuesday: HOTWORX weeks 1-4, REST weeks 5-6
-  if (dow === 2) {
-    if (isPeak) return { type:'REST', name:'Rest Day', desc:'Full rest · Easy walk optional · Infrared sauna optional', emoji:'💤' };
-    const w1note = wk === 1 ? ' (optional this week)' : wk === 2 ? ' (mandatory this week)' : '';
-    return { type:'HOTWORX', name:'Hot Yoga / Hot ISO', desc:`Hot Yoga or Hot ISO — 30-40 min${w1note} · Replenish electrolytes`, emoji:'🧘‍♀️' };
-  }
+  // Tuesday: REST (all weeks)
+  if (dow === 2) return { type:'REST', name:'Rest Day', desc:'Full rest · Easy walk optional · Infrared sauna optional', emoji:'💤' };
 
   // Lift days: Mon, Wed, Thu, Fri
   let workout, showWarmup = true, weekNote = null;
@@ -682,9 +759,9 @@ function fmtTime(ts) {
 function isLiftDay(dayInfo) {
   return dayInfo && dayInfo.type === 'LIFT';
 }
-function isSunday(dateStr) {
+function isMonday(dateStr) {
   const d = new Date(dateStr + 'T12:00:00');
-  return d.getDay() === 0;
+  return d.getDay() === 1;
 }
 
 // LS helpers
@@ -722,64 +799,90 @@ function switchTab(tab) {
 
 function renderToday() {
   const date = todayStr();
-  const dayInfo = getDayInfo(date);
   const wk = weekNum(date);
   const el = document.getElementById('today-content');
 
-  // Header
-  const workoutLabel = dayInfo
-    ? (dayInfo.type === 'LIFT' ? dayInfo.workout.name
-      : dayInfo.type === 'HOTWORX' ? dayInfo.name
-      : dayInfo.type === 'TAPER' ? dayInfo.name
-      : 'Rest Day')
-    : 'No Program';
+  // Check for dynamic program (after Phase 1 ends)
+  let dynProg = null, dynWk = null;
+  if (date > '2026-06-13') {
+    const programs = lsGet('loaded_programs', []);
+    dynProg = programs.find(p => date >= p.start && date <= p.end) || null;
+    if (dynProg) {
+      dynWk = Math.floor((new Date(date + 'T12:00:00') - new Date(dynProg.start + 'T12:00:00')) / 86400000 / 7) + 1;
+    }
+  }
 
-  const phaseLabel = wk >= 1 && wk <= 6 ? `Week ${wk} · ${
-    wk <= 2 ? 'Re-activation' : wk === 3 ? 'Intensification' : wk === 4 ? 'Deload' : 'Peak Phase'
-  }` : (date < '2026-05-01' ? 'Program starts May 1' : date > '2026-06-13' ? 'Program complete 🎉' : '');
+  const phaseLabel = wk >= 1 && wk <= 6
+    ? `Week ${wk} · ${wk <= 2 ? 'Re-activation' : wk === 3 ? 'Intensification' : wk === 4 ? 'Deload' : 'Peak Phase'}`
+    : (date >= '2026-05-01' && date <= '2026-05-03' ? 'Ramp-In' : '');
+  const dynPhase = dynProg ? (dynProg.weekPhases.find(ph => ph.weeks.includes(dynWk)) || null) : null;
+  const displayPhase = phaseLabel || (dynPhase ? `Week ${dynWk} · ${dynPhase.label}` : '');
 
   let html = `
     <div class="page-header">
       <div class="sub">${fmtDate(date)}</div>
-      <h1>${workoutLabel}</h1>
-      ${phaseLabel ? `<div class="phase-badge">${phaseLabel}</div>` : ''}
+      <h1>${dynProg ? dynProg.name : 'This Week'}</h1>
+      ${displayPhase ? `<div class="phase-badge">${displayPhase}</div>` : ''}
     </div>
   `;
 
-  if (!dayInfo && (date < '2026-05-01' || date > '2026-06-13')) {
-    html += `<div class="no-workout" style="margin-top:40px">
-      ${date < '2026-05-01' ? '🗓️<br><br>Your program kicks off May 1. Get ready.' : '🏆<br><br>6 weeks done. You showed up every day.'}
-    </div>`;
+  if (date < '2026-05-01') {
+    html += `<div class="no-workout" style="margin-top:40px">🗓️<br><br>Your program kicks off May 1. Get ready.</div>`;
     el.innerHTML = html;
     return;
   }
 
-  // WORKOUT
-  html += renderWorkoutSection(date, dayInfo);
-  // PROTEIN
-  html += renderProteinSection(date);
-  // SUPPS
-  html += renderSupps(date, dayInfo, wk);
-  // NOTES
-  html += renderNotesSection(date);
+  if (date > '2026-06-13' && !dynProg) {
+    html += `<div class="no-workout" style="margin-top:40px">🤖<br><br>Program complete. Open the AI tab and ask: <em>"What should my next phase look like?"</em></div>`;
+    el.innerHTML = html;
+    return;
+  }
 
+  // Taper days (Jun 12-13) — show rest card, no workouts
+  const dayInfo = getDayInfo(date);
+  if (dayInfo && dayInfo.type === 'TAPER') {
+    html += `<div class="section"><div class="card"><div class="card-body"><div class="rest-card"><div class="day-emoji">${dayInfo.emoji}</div><div class="day-title">${dayInfo.name}</div><div class="day-desc">${dayInfo.desc}</div></div></div></div></div>`;
+    html += renderProteinSection(date);
+    el.innerHTML = html;
+    attachProteinHandlers(date);
+    return;
+  }
+
+  let weekId;
+  if (dynProg) {
+    html += renderDynWeeklyWorkouts(dynProg, dynWk);
+    weekId = `dp_${dynProg.start}_w${dynWk}`;
+  } else if (wk >= 1 && wk <= 6) {
+    html += renderWeeklyWorkouts(wk);
+    weekId = `w${wk}`;
+  } else {
+    // Ramp-in (May 1–3)
+    if (dayInfo && dayInfo.type === 'LIFT') {
+      html += renderSingleLiftDay(dayInfo.workout, 'ramp');
+      weekId = 'ramp';
+    } else if (dayInfo) {
+      html += `<div class="section"><div class="card"><div class="card-body"><div class="rest-card"><div class="day-emoji">${dayInfo.emoji}</div><div class="day-title">${dayInfo.name}</div><div class="day-desc">${dayInfo.desc}</div></div></div></div></div>`;
+      weekId = null;
+    }
+  }
+
+  html += renderProteinSection(date);
   el.innerHTML = html;
-  attachWorkoutHandlers(date, dayInfo);
+  if (weekId) attachWeeklyWorkoutHandlers(weekId);
   attachProteinHandlers(date);
-  attachNotesHandler(date);
 }
 
 // ── SUPPS ────────────────────────────────────
 
 function renderSupps(date, dayInfo, wk) {
   const isLift = isLiftDay(dayInfo);
-  const isSun = isSunday(date);
+  const isMon = isMonday(date);
   const dose = getRetaDose(wk);
 
   let items = [];
 
-  if (isSun && wk >= 1 && wk <= 6) {
-    items.push({ cls: 'supp-reta', name: `Reta ${dose}`, timing: 'Sunday injection' });
+  if (isMon && wk >= 1 && wk <= 6) {
+    items.push({ cls: 'supp-reta', name: `Reta ${dose}`, timing: 'Monday injection' });
   }
   if (isLift) {
     items.push({ name: 'Ipa 250mcg', timing: 'morning · 60-90 min before eating' });
@@ -787,23 +890,15 @@ function renderSupps(date, dayInfo, wk) {
   items.push({ name: 'Ipa 250mcg', timing: 'before bed · 2hr fasted minimum' });
   items.push({ name: 'Creatine 5g', timing: 'with food' });
 
-  const suppChecks = lsGet(`supp_checks_${date}`, []);
-  let rows = items.map((s, i) => {
-    const sid = `supp_${i}`;
-    const checked = suppChecks.includes(sid);
-    return `
-    <div class="supp-item ${s.cls || ''} ${checked ? 'supp-checked' : ''}" id="supp-item-${sid}">
-      <div class="ex-check ${checked ? 'checked' : ''}" id="supp-check-${sid}" onclick="toggleSupp('${date}','${sid}')" style="flex-shrink:0;margin-top:2px">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="2 7 5.5 10.5 12 3.5"/>
-        </svg>
-      </div>
+  let rows = items.map(s => `
+    <div class="supp-item ${s.cls || ''}">
+      <div class="supp-dot"></div>
       <div>
-        <div class="supp-name" style="${checked ? 'text-decoration:line-through;opacity:0.5' : ''}">${s.name}</div>
+        <div class="supp-name">${s.name}</div>
         <div class="supp-timing">${s.timing}</div>
       </div>
     </div>
-  `}).join('');
+  `).join('');
 
   return `
     <div class="section">
@@ -935,6 +1030,164 @@ function attachWorkoutHandlers(date, dayInfo) {
   });
 }
 
+// ── WEEKLY WORKOUTS ───────────────────────────
+
+function getWeekWorkouts(wk) {
+  if (wk < 1 || wk > 6) return [];
+  const isPeak = wk >= 5;
+  const isDeload = wk === 4;
+  return [
+    { key: 'GH', workout: isPeak ? W.GH_PEAK : isDeload ? W.GH_DELOAD : W.GH_BASE },
+    { key: 'SB', workout: isPeak ? W.SB_PEAK : isDeload ? W.SB_DELOAD : W.SB_BASE },
+    { key: 'QA', workout: isPeak ? W.QA_PEAK : isDeload ? W.QA_DELOAD : W.QA_BASE },
+    { key: 'AC', workout: isPeak ? W.AC_PEAK : isDeload ? W.AC_DELOAD : W.AC_BASE },
+  ];
+}
+
+function renderExerciseRow(ex, checks, wkey) {
+  const checked = checks.includes(ex.id);
+  const w = lsGet(`weight_${ex.id}`, {weight:'', updatedAt:''});
+  return `
+    <div class="exercise-item ${checked ? 'checked' : ''}" data-id="${ex.id}" data-wkey="${wkey}">
+      <div class="ex-check ${checked ? 'checked' : ''}" data-check="${ex.id}" data-wkey="${wkey}">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="2 7 5.5 10.5 12 3.5"/>
+        </svg>
+      </div>
+      <div class="ex-info">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-sets">${ex.sets}</div>
+        ${ex.note ? `<div class="ex-note">★ ${ex.note}</div>` : ''}
+      </div>
+      <div class="ex-weight">
+        <input type="number" inputmode="decimal" placeholder="—" value="${w.weight || ''}" data-ex="${ex.id}" class="weight-input" />
+        <label>lbs</label>
+      </div>
+    </div>`;
+}
+
+function renderWorkoutAccordionItem(key, workout, weekId, weekNote) {
+  const storageKey = `checks_${weekId}_${key}`;
+  const checks = lsGet(storageKey, []);
+  const total = workout.exercises.length;
+  const done = checks.filter(id => workout.exercises.some(e => e.id === id)).length;
+  const compId = `completion_${weekId}_${key}`;
+
+  const mainExes = workout.exercises.filter(e => !e.isAb && !e.isGlute);
+  const abExes = workout.exercises.filter(e => e.isAb);
+  const gluteExes = workout.exercises.filter(e => e.isGlute);
+
+  let bodyHtml = `<div class="warmup-bar"><span>🏃‍♀️</span><span>${WARMUP}</span></div>`;
+  if (weekNote) bodyHtml += `<div class="week-note">⚡ ${weekNote}</div>`;
+  if (workout.note) bodyHtml += `<div class="week-note">ℹ️ ${workout.note}</div>`;
+  bodyHtml += mainExes.map(ex => renderExerciseRow(ex, checks, key)).join('');
+  if (abExes.length) {
+    bodyHtml += `<div class="section-divider">AB CIRCUIT / FINISHER</div>`;
+    bodyHtml += abExes.map(ex => renderExerciseRow(ex, checks, key)).join('');
+  }
+  if (gluteExes.length) {
+    bodyHtml += `<div class="section-divider">GLUTE FINISHER</div>`;
+    bodyHtml += gluteExes.map(ex => renderExerciseRow(ex, checks, key)).join('');
+  }
+
+  return `
+    <div class="workout-accordion-item" data-wkey="${key}" data-weekid="${weekId}">
+      <div class="workout-accordion-header">
+        <div class="workout-accordion-name">${workout.name}</div>
+        <div class="workout-accordion-meta">
+          <span class="workout-completion" id="${compId}" ${done === 0 ? 'style="display:none"' : ''}>${done}/${total}</span>
+          <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="workout-accordion-body">${bodyHtml}</div>
+    </div>`;
+}
+
+function renderWeeklyWorkouts(wk) {
+  const workoutList = getWeekWorkouts(wk);
+  if (!workoutList.length) return '';
+  const weekNote = wk === 3 ? 'Week 3 intensification — supersets on lower days, increase load 5-10% vs W1-2' : null;
+  const weekId = `w${wk}`;
+  let inner = workoutList.map(({key, workout}) => renderWorkoutAccordionItem(key, workout, weekId, weekNote)).join('');
+  return `<div class="section"><div class="card"><div class="card-header"><span class="icon">🏋️‍♀️</span><h2>This Week's Workouts</h2></div><div class="card-body" style="padding:0">${inner}</div></div></div>`;
+}
+
+function renderDynWeeklyWorkouts(prog, weekInProg) {
+  const phaseInfo = prog.weekPhases.find(ph => ph.weeks.includes(weekInProg));
+  if (!phaseInfo) return '';
+  const phase = phaseInfo.phase;
+  const weekId = `dp_${prog.start}_w${weekInProg}`;
+  const splitOrder = ['1','3','4','5'].map(d => prog.weekSchedule[d]).filter(s => s && s !== 'REST');
+  const seen = new Set();
+  const uniqueSplits = splitOrder.filter(s => { if (seen.has(s)) return false; seen.add(s); return true; });
+  let inner = '';
+  uniqueSplits.forEach(splitKey => {
+    const workout = prog.workouts[`${splitKey}_${phase}`] || prog.workouts[`${splitKey}_BASE`];
+    if (workout) inner += renderWorkoutAccordionItem(splitKey, workout, weekId, null);
+  });
+  return `<div class="section"><div class="card"><div class="card-header"><span class="icon">🏋️‍♀️</span><h2>This Week's Workouts</h2></div><div class="card-body" style="padding:0">${inner}</div></div></div>`;
+}
+
+function renderSingleLiftDay(workout, weekId) {
+  const checks = lsGet(`checks_${weekId}_RAMP`, []);
+  let bodyHtml = `<div class="warmup-bar"><span>🏃‍♀️</span><span>${WARMUP}</span></div>`;
+  if (workout.note) bodyHtml += `<div class="week-note">ℹ️ ${workout.note}</div>`;
+  bodyHtml += workout.exercises.map(ex => renderExerciseRow(ex, checks, 'RAMP')).join('');
+  return `<div class="section"><div class="card"><div class="card-header"><span class="icon">🏋️‍♀️</span><h2>${workout.name}</h2></div><div class="card-body">${bodyHtml}</div></div></div>`;
+}
+
+function attachWeeklyWorkoutHandlers(weekId) {
+  // Accordion toggle (one open at a time)
+  document.querySelectorAll('.workout-accordion-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const item = header.closest('.workout-accordion-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.workout-accordion-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // Checkbox toggles
+  document.querySelectorAll('[data-check]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.check;
+      const wkey = btn.dataset.wkey;
+      const storageKey = `checks_${weekId}_${wkey}`;
+      const checks = lsGet(storageKey, []);
+      const idx = checks.indexOf(id);
+      if (idx === -1) checks.push(id); else checks.splice(idx, 1);
+      lsSet(storageKey, checks);
+      const exItem = btn.closest('.exercise-item');
+      const checked = checks.includes(id);
+      btn.classList.toggle('checked', checked);
+      exItem.classList.toggle('checked', checked);
+      // Update completion badge
+      const accordionItem = document.querySelector(`.workout-accordion-item[data-wkey="${wkey}"]`);
+      if (accordionItem) {
+        const allBtns = accordionItem.querySelectorAll('[data-check]');
+        const total = allBtns.length;
+        const done = [...allBtns].filter(b => checks.includes(b.dataset.check)).length;
+        const countEl = document.getElementById(`completion_${weekId}_${wkey}`);
+        if (countEl) { countEl.textContent = `${done}/${total}`; countEl.style.display = done > 0 ? '' : 'none'; }
+      }
+    });
+  });
+
+  // Weight inputs
+  let debounceTimers = {};
+  document.querySelectorAll('.weight-input').forEach(input => {
+    input.addEventListener('input', () => {
+      const id = input.dataset.ex;
+      clearTimeout(debounceTimers[id]);
+      debounceTimers[id] = setTimeout(() => {
+        const val = input.value.trim();
+        if (val !== '') lsSet(`weight_${id}`, { weight: val, updatedAt: todayStr() });
+      }, 600);
+    });
+  });
+}
+
 // ── PROTEIN ──────────────────────────────────
 
 function renderProteinSection(date) {
@@ -1046,18 +1299,118 @@ function attachNotesHandler(date) {
   });
 }
 
+// ═══════════════════════════════════════════════
+// PROGRAM TAB
+// ═══════════════════════════════════════════════
 
-function toggleSupp(date, sid) {
-  const checks = lsGet(`supp_checks_${date}`, []);
-  const idx = checks.indexOf(sid);
-  if (idx === -1) checks.push(sid); else checks.splice(idx, 1);
-  lsSet(`supp_checks_${date}`, checks);
-  const checked = checks.includes(sid);
-  const checkEl = document.getElementById(`supp-check-${sid}`);
-  const itemEl = document.getElementById(`supp-item-${sid}`);
-  const nameEl = itemEl ? itemEl.querySelector('.supp-name') : null;
-  if (checkEl) checkEl.classList.toggle('checked', checked);
-  if (nameEl) nameEl.style.cssText = checked ? 'text-decoration:line-through;opacity:0.5' : '';
+function getAllProgramDays(start, end) {
+  const days = [];
+  let d = new Date(start + 'T12:00:00');
+  const e = new Date(end + 'T12:00:00');
+  while (d <= e) {
+    days.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
+    d.setDate(d.getDate() + 1);
+  }
+  return days;
+}
+
+function renderProgram() {
+  const el = document.getElementById('program-content');
+  if (!el) return;
+  const today = todayStr();
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  let html = `<div class="program-header"><h1>Program</h1><p>May 1 – June 13, 2026</p></div>`;
+
+  let lastWkKey = null;
+  const days = getAllProgramDays('2026-05-01', '2026-06-13');
+
+  days.forEach(dateStr => {
+    const wk = weekNum(dateStr);
+    const dayInfo = getDayInfo(dateStr);
+    if (!dayInfo) return;
+
+    // Week section header
+    const wkKey = wk <= 0 ? 'ramp' : wk;
+    if (wkKey !== lastWkKey) {
+      lastWkKey = wkKey;
+      const wkLabel = wk <= 0 ? 'Ramp-In'
+        : `Week ${wk} · ${wk <= 2 ? 'Re-activation' : wk === 3 ? 'Intensification' : wk === 4 ? 'Deload' : 'Peak Phase'}`;
+      html += `<div class="prog-week-header">${wkLabel}</div>`;
+    }
+
+    const isToday = dateStr === today;
+    const isPast = dateStr < today;
+    const d = new Date(dateStr + 'T12:00:00');
+    const dayName = dayNames[d.getDay()];
+    const dayNum = d.getDate();
+    const canExpand = dayInfo.type === 'LIFT';
+
+    const workoutName = dayInfo.type === 'LIFT' ? dayInfo.workout.name
+      : dayInfo.name || 'Rest Day';
+    const typeStr = dayInfo.type === 'LIFT' ? 'LIFT'
+      : dayInfo.type === 'TAPER' ? 'TAPER' : 'REST';
+    const metaParts = [typeStr, isToday ? 'TODAY' : null, canExpand ? 'tap to expand' : null].filter(Boolean);
+
+    html += `
+      <div class="prog-day-row ${isToday ? 'today' : ''} ${isPast ? 'past' : ''}"
+           data-date="${dateStr}" ${canExpand ? `onclick="toggleProgDay(this)"` : ''}>
+        <div class="prog-day-left">
+          <div class="prog-day-name">${dayName}</div>
+          <div class="prog-day-num">${dayNum}</div>
+          ${isToday ? '<div class="prog-today-dot"></div>' : ''}
+        </div>
+        <div class="prog-day-info">
+          <div class="prog-day-workout-name">${workoutName}</div>
+          <div class="prog-day-meta">${metaParts.join(' · ')}</div>
+        </div>
+        ${canExpand ? `<svg class="prog-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>` : ''}
+      </div>`;
+
+    if (canExpand) {
+      const exercises = dayInfo.workout.exercises;
+      const mainExes = exercises.filter(e => !e.isAb && !e.isGlute);
+      const abExes = exercises.filter(e => e.isAb);
+      const gluteExes = exercises.filter(e => e.isGlute);
+      const exRow = (ex, tag) => `<div class="prog-ex-row"><span class="prog-ex-name">${ex.name}${tag ? `<span class="prog-ex-tag">${tag}</span>` : ''}</span><span class="prog-ex-sets">${ex.sets}</span></div>`;
+      let exHtml = mainExes.map(e => exRow(e, '')).join('') + abExes.map(e => exRow(e, 'AB')).join('') + gluteExes.map(e => exRow(e, 'GLUTE')).join('');
+      const autoOpen = isToday ? ' open' : '';
+      html += `<div class="prog-day-detail${autoOpen}" id="detail_${dateStr}">${exHtml}</div>`;
+      if (isToday) {
+        // Mark the row as expanded too (done after innerHTML set via JS below)
+      }
+    }
+  });
+
+  // Future loaded programs
+  const dynPrograms = lsGet('loaded_programs', []);
+  if (dynPrograms.length) {
+    html += `<div class="prog-week-header" style="margin-top:8px">Coming Up</div>`;
+    dynPrograms.forEach(prog => {
+      const phaseCount = (prog.weekPhases || []).length;
+      html += `<div class="prog-future-block"><div class="prog-future-name">${prog.name}</div><div class="prog-future-dates">${prog.start} → ${prog.end} · ${phaseCount} phase${phaseCount !== 1 ? 's' : ''}</div></div>`;
+    });
+  }
+
+  el.innerHTML = html;
+
+  // Mark today's row as expanded if it was auto-opened
+  if (today >= '2026-05-01' && today <= '2026-06-13') {
+    const todayRow = el.querySelector(`.prog-day-row[data-date="${today}"]`);
+    if (todayRow && getDayInfo(today)?.type === 'LIFT') todayRow.classList.add('expanded');
+    // Scroll today into view
+    setTimeout(() => { if (todayRow) todayRow.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 80);
+  }
+}
+
+function toggleProgDay(row) {
+  const dateStr = row.dataset.date;
+  const detail = document.getElementById(`detail_${dateStr}`);
+  if (!detail) return;
+  const isOpen = detail.classList.contains('open');
+  document.querySelectorAll('.prog-day-detail.open').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.prog-day-row.expanded').forEach(r => r.classList.remove('expanded'));
+  if (!isOpen) { detail.classList.add('open'); row.classList.add('expanded'); }
 }
 
 // ═══════════════════════════════════════════════
@@ -1067,226 +1420,95 @@ function toggleSupp(date, sid) {
 function renderLog() {
   const el = document.getElementById('log-content');
 
-  // Gather all saved weights
-  const allExercises = [];
+  let html = `<div class="log-header"><h1>Weight Log</h1><p>Every lift in your program</p></div>`;
+
+  // Phase 1 split groups — deduplicated across all phase variants
+  const phase1Groups = [
+    { label: '🍑 Glutes + Hamstrings', variants: [W.GH_BASE, W.GH_DELOAD, W.GH_PEAK] },
+    { label: '💪 Shoulders + Back',    variants: [W.SB_BASE, W.SB_DELOAD, W.SB_PEAK] },
+    { label: '🦵 Quads + Abs',         variants: [W.QA_BASE, W.QA_DELOAD, W.QA_PEAK] },
+    { label: '🔥 Arms + Core',         variants: [W.AC_BASE, W.AC_DELOAD, W.AC_PEAK] },
+  ];
+
+  const allKnownIds = new Set();
+
+  phase1Groups.forEach(group => {
+    const seen = new Set();
+    const exercises = [];
+    group.variants.forEach(variant => {
+      variant.exercises.forEach(ex => {
+        if (!seen.has(ex.id)) { seen.add(ex.id); allKnownIds.add(ex.id); exercises.push(ex); }
+      });
+    });
+    html += renderLogGroup(group.label, exercises, allKnownIds);
+  });
+
+  // RAMP_IN-only exercises (not in any main split)
+  const rampOnly = W.RAMP_IN.exercises.filter(e => !allKnownIds.has(e.id));
+  if (rampOnly.length) {
+    rampOnly.forEach(e => allKnownIds.add(e.id));
+    html += renderLogGroup('📋 Ramp-In', rampOnly, allKnownIds);
+  }
+
+  // Dynamic program exercises grouped by split key
+  const dynPrograms = lsGet('loaded_programs', []);
+  if (dynPrograms.length) {
+    const splitLabels = { GH:'🍑 Glutes + Hamstrings', SB:'💪 Shoulders + Back', QA:'🦵 Quads + Abs', AC:'🔥 Arms + Core' };
+    const dynGroups = {};
+    dynPrograms.forEach(prog => {
+      Object.entries(prog.workouts).forEach(([workoutKey, workout]) => {
+        const splitKey = workoutKey.split('_')[0];
+        if (!dynGroups[splitKey]) dynGroups[splitKey] = { label: `${splitLabels[splitKey] || splitKey} (${prog.name})`, exercises: [] };
+        workout.exercises.forEach(ex => {
+          if (!allKnownIds.has(ex.id) && !dynGroups[splitKey].exercises.some(e => e.id === ex.id)) {
+            dynGroups[splitKey].exercises.push(ex);
+            allKnownIds.add(ex.id);
+          }
+        });
+      });
+    });
+    Object.values(dynGroups).forEach(g => {
+      if (g.exercises.length) html += renderLogGroup(g.label, g.exercises, allKnownIds);
+    });
+  }
+
+  // Orphaned weights (logged but not in any known program)
+  const orphaned = [];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (key && key.startsWith('weight_')) {
       const id = key.slice(7);
-      const data = lsGet(key, {});
-      if (data && data.weight) {
-        allExercises.push({ id, weight: data.weight, updatedAt: data.updatedAt });
+      if (!allKnownIds.has(id)) {
+        const data = lsGet(key, {});
+        if (data && data.weight) orphaned.push({ id, name: id.replace(/_/g, ' '), weight: data.weight, updatedAt: data.updatedAt });
       }
     }
   }
+  if (orphaned.length) html += renderLogGroup('📋 Previous Lifts', orphaned, new Set());
 
-  let html = `
-    <div class="log-header">
-      <h1>Weight Log</h1>
-      <p>Last recorded weight per exercise</p>
-    </div>
-  `;
+  el.innerHTML = html;
+}
 
-  if (!allExercises.length) {
-    html += `
-      <div class="log-empty">
-        <div class="emoji">📋</div>
-        <div>No weights logged yet.<br>Start a workout to begin tracking.</div>
-      </div>`;
-    el.innerHTML = html;
-    return;
-  }
-
-  // Build exercise name map
-  const nameMap = {};
-  const allW = [W.RAMP_IN, W.GH_BASE, W.GH_DELOAD, W.GH_PEAK, W.SB_BASE, W.SB_DELOAD, W.SB_PEAK,
-                W.QA_BASE, W.QA_DELOAD, W.QA_PEAK, W.AC_BASE, W.AC_DELOAD, W.AC_PEAK];
-  allW.forEach(w => w.exercises.forEach(e => { nameMap[e.id] = e.name; }));
-
-  allExercises.sort((a, b) => (nameMap[a.id] || a.id).localeCompare(nameMap[b.id] || b.id));
-
-  html += `<div class="log-group"><div class="log-group-title">All Exercises</div>`;
-  allExercises.forEach(ex => {
-    const name = nameMap[ex.id] || ex.id.replace(/_/g, ' ');
-    const dateLabel = ex.updatedAt ? fmtDate(ex.updatedAt) : '';
+function renderLogGroup(label, exercises, knownIds) {
+  let html = `<div class="log-group"><div class="log-group-title">${label}</div>`;
+  exercises.forEach(ex => {
+    const w = lsGet(`weight_${ex.id}`, {});
+    const dateLabel = w.updatedAt ? fmtDate(w.updatedAt) : null;
     html += `
       <div class="log-item">
         <div>
-          <div class="log-ex-name">${name}</div>
-          ${dateLabel ? `<div class="log-ex-date">${dateLabel}</div>` : ''}
+          <div class="log-ex-name">${ex.name || ex.id.replace(/_/g,' ')}</div>
+          <div class="log-ex-date" ${!dateLabel ? 'style="color:var(--border)"' : ''}>${dateLabel || 'not logged yet'}</div>
         </div>
         <div style="text-align:right">
-          <div class="log-weight-val">${ex.weight}</div>
-          <div class="log-weight-unit">lbs</div>
+          ${w.weight
+            ? `<div class="log-weight-val">${w.weight}</div><div class="log-weight-unit">lbs</div>`
+            : `<div class="log-weight-val" style="color:var(--border)">—</div>`}
         </div>
       </div>`;
   });
   html += '</div>';
-
-  el.innerHTML = html;
-}
-
-
-// ═══════════════════════════════════════════════
-// PROGRAM TAB
-// ═══════════════════════════════════════════════
-
-// Track which program days are expanded
-let programExpanded = {};
-
-function toggleProgramDay(ds) {
-  programExpanded[ds] = !programExpanded[ds];
-  const detailEl = document.getElementById('prog-detail-' + ds);
-  const chevEl   = document.getElementById('prog-chev-' + ds);
-  if (!detailEl) return;
-  detailEl.style.display = programExpanded[ds] ? 'block' : 'none';
-  if (chevEl) chevEl.style.transform = programExpanded[ds] ? 'rotate(180deg)' : 'rotate(0deg)';
-}
-
-function renderProgram() {
-  const el = document.getElementById('program-content');
-  const today = todayStr();
-
-  const TYPE_STYLE = {
-    LIFT:   { bg: '#FFF8EC', border: '#F59E0B', label: '#92400E', dot: '#F59E0B' },
-    HOTWORX:{ bg: '#FFF1F2', border: '#F87171', label: '#991B1B', dot: '#F87171' },
-    REST:   { bg: '#F0F9FF', border: '#7DD3FC', label: '#075985', dot: '#7DD3FC' },
-    TAPER:  { bg: '#F5F3FF', border: '#A78BFA', label: '#5B21B6', dot: '#A78BFA' },
-  };
-
-  const allDays = [];
-  const start = new Date('2026-05-01T12:00:00');
-  const end   = new Date('2026-06-14T12:00:00');
-  for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
-    const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    allDays.push(ds);
-  }
-
-  const weeks = [];
-  let currentWeek = [];
-  let currentWkNum = null;
-  allDays.forEach(ds => {
-    const wk = weekNum(ds);
-    const wkLabel = wk < 1 ? 'Ramp-In' : `Week ${wk}`;
-    if (wkLabel !== currentWkNum) {
-      if (currentWeek.length) weeks.push({ label: currentWkNum, days: currentWeek });
-      currentWeek = [];
-      currentWkNum = wkLabel;
-    }
-    currentWeek.push(ds);
-  });
-  if (currentWeek.length) weeks.push({ label: currentWkNum, days: currentWeek });
-
-  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-  let html = `
-    <div style="background:var(--grad);color:white;padding:20px 20px 16px">
-      <h1 style="font-size:22px;font-weight:800">Full Program</h1>
-      <p style="font-size:13px;opacity:.8;margin-top:4px">May 1 – June 13 · Tap lift days to see exercises</p>
-    </div>
-  `;
-
-  weeks.forEach(week => {
-    const wkNum = weekNum(week.days[0]);
-    const phaseLabel = wkNum < 1 ? 'Ramp-In' :
-      wkNum <= 2 ? 'Re-activation' :
-      wkNum === 3 ? 'Intensification' :
-      wkNum === 4 ? 'Deload' : 'Peak Phase';
-
-    html += `<div style="margin:14px 16px 0">
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">
-        ${week.label}${wkNum >= 1 ? ' · ' + phaseLabel : ''}
-      </div>`;
-
-    week.days.forEach(ds => {
-      const info = getDayInfo(ds);
-      const d = new Date(ds + 'T12:00:00');
-      const dayName = dayNames[d.getDay()];
-      const isToday = (ds === today);
-      const isPast  = (ds < today);
-      const isLift  = info && info.type === 'LIFT';
-
-      let type = info ? info.type : 'REST';
-      let label = info
-        ? (info.type === 'LIFT' ? info.workout.name : info.name || 'Rest Day')
-        : 'Rest Day';
-
-      const style = TYPE_STYLE[type] || TYPE_STYLE.REST;
-      const isExpanded = !!programExpanded[ds];
-
-      // Build exercise detail HTML for lift days
-      let detailHtml = '';
-      if (isLift) {
-        const exes = info.workout.exercises;
-        const hasWarmup = info.showWarmup;
-        let rows = '';
-        if (hasWarmup) {
-          rows += `<div style="font-size:11px;color:#92400E;background:#FEF3C7;border-radius:6px;padding:6px 8px;margin-bottom:6px">🏃‍♀️ ${WARMUP}</div>`;
-        }
-        exes.forEach(ex => {
-          const isAb    = ex.isAb;
-          const isGlute = ex.isGlute;
-          const tag = isAb ? ' · AB' : isGlute ? ' · GLUTE' : '';
-          rows += `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #F1F5F9">
-            <div style="font-size:12px;color:var(--text);font-weight:500;flex:1;padding-right:8px">${ex.name}${ex.note ? '<br><span style=\'font-size:10px;color:var(--warn)\'>★ ' + ex.note + '</span>' : ''}</div>
-            <div style="font-size:11px;color:${style.label};font-weight:700;white-space:nowrap">${ex.sets}${tag}</div>
-          </div>`;
-        });
-        detailHtml = `
-          <div id="prog-detail-${ds}" style="display:${isExpanded ? 'block' : 'none'};padding:8px 0 4px;border-top:1px solid ${style.border}">
-            ${rows}
-          </div>`;
-      }
-
-      html += `
-        <div style="
-          margin-bottom:6px;
-          background:${isToday ? style.bg : isPast ? '#F8FAFC' : '#FAFAF8'};
-          border:1.5px solid ${isToday ? style.border : '#E2E8F0'};
-          border-radius:12px;
-          overflow:hidden;
-          opacity:${isPast ? '0.65' : '1'};
-          ${isToday ? 'box-shadow:0 2px 8px rgba(0,0,0,0.08)' : ''}
-        ">
-          <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:${isLift ? 'pointer' : 'default'}"
-            ${isLift ? `onclick="toggleProgramDay('${ds}')"` : ''}>
-            <div style="text-align:center;min-width:36px">
-              <div style="font-size:11px;font-weight:700;color:${isToday ? style.label : 'var(--muted)'}">${dayName}</div>
-              <div style="font-size:13px;font-weight:600;color:${isToday ? style.label : 'var(--text)'}">${d.getDate()}</div>
-            </div>
-            <div style="width:6px;height:6px;border-radius:50%;background:${isToday ? style.dot : '#CBD5E1'};flex-shrink:0"></div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:${isToday ? '700' : '500'};color:${isToday ? style.label : isPast ? 'var(--muted)' : 'var(--text)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                ${isToday ? '▶ ' : ''}${label}
-              </div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">${type}${isToday ? ' · TODAY' : ''}${isLift ? ' · tap to expand' : ''}</div>
-            </div>
-            ${isLift ? `<div id="prog-chev-${ds}" style="font-size:14px;color:${style.label};transition:transform .2s;transform:${isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'};flex-shrink:0">⌄</div>` : ''}
-          </div>
-          ${isLift ? `<div style="padding:0 14px">${detailHtml}</div>` : ''}
-        </div>`;
-    });
-
-    html += '</div>';
-  });
-
-  html += '<div style="height:16px"></div>';
-  el.innerHTML = html;
-
-  // Auto-expand today if it is a lift day
-  if (!programExpanded[today]) {
-    const todayInfo = getDayInfo(today);
-    if (todayInfo && todayInfo.type === 'LIFT') {
-      programExpanded[today] = true;
-    }
-  }
-
-  // Scroll to today
-  setTimeout(() => {
-    const allCards = el.querySelectorAll('[style*="box-shadow"]');
-    if (allCards.length) allCards[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 80);
+  return html;
 }
 
 // ═══════════════════════════════════════════════
@@ -1296,38 +1518,33 @@ function renderProgram() {
 const SYSTEM_PROMPT = `You are a personal trainer and wellness coach for Meg. Be direct and concise — no fluff, no pleasantries. Like a smart trainer who knows her well.
 
 PROFILE:
-- 130 lbs, 6-week structured training phase (May 1 – June 13, 2026)
+- 130 lbs, ongoing structured training program (Phase 1: May 1 – June 13, 2026)
 - Goals: defined abs, defined shoulders and back, tight glutes, defined quads. NOT just skinny — definition.
 - Coming back from a full deload
 - RIGHT WRIST GANGLION CYST: NO push-ups, NO flat bench press, NO dips, NO dorsiflexed wrist under load
 - Preferred grip: neutral. Triceps: rope pushdowns and OH extension ONLY.
-- Gym: 24 Hour Fitness (full free weights, cables, machines, squat rack) + Hotworx
+- Gym: 24 Hour Fitness (full free weights, cables, machines, squat rack)
+- Hotworx membership cancelled — all former Hotworx days are now rest days
 
-SCHEDULE STRUCTURE:
-- Ramp-in: May 1 (lift), May 2 (Hotworx), May 3 (rest)
-- Week 1-2 (May 4-17): Mon LIFT Glutes+Hams | Tue Hotworx | Wed LIFT Shoulders+Back | Thu LIFT Quads+Abs | Fri LIFT Arms+Core | Sat Hotworx | Sun Rest
-- Week 3 (May 18-24): Same split, intensification — supersets on lower days, +5-10% load
+PHASE 1 SCHEDULE (May 1 – June 13, 2026):
+- Ramp-in: May 1 (lift), May 2-3 (rest)
+- Weeks 1-2 (May 4-17): Mon LIFT Glutes+Hams | Tue REST | Wed LIFT Shoulders+Back | Thu LIFT Quads+Abs | Fri LIFT Arms+Core | Sat REST | Sun REST
+- Week 3 (May 18-24): Intensification — supersets on lower days, +5-10% load
 - Week 4 (May 25-31): DELOAD — same split, reduced volume
-- Weeks 5-6 (Jun 1-13): Mon LIFT Glutes+Hams PEAK | Tue REST | Wed LIFT Shoulders+Back PEAK | Thu LIFT Quads+Abs PEAK | Fri LIFT Arms+Core PEAK | Sat Hotworx | Sun Rest
-- Jun 12-13: Taper rest — no lifting, no HIIT
+- Weeks 5-6 (Jun 1-11): PEAK phase — same split, peak intensity
+- Jun 12-13: Taper rest — no lifting
+- Workout scheduling is flexible within the week — all 4 workouts shown as a weekly list
 
 PEPTIDE PROTOCOL:
 - Ipamorelin (Ipa) 250mcg:
-  - Lift days (Mon/Wed/Thu/Fri): TWICE daily
-    - Morning: inject, then 60-90 min fasted before eating
-    - Before bed: 2hr fasted minimum
+  - Lift days (Mon/Wed/Thu/Fri): TWICE daily — morning (60-90 min fasted), before bed (2hr fasted)
   - Non-lift days: once daily, before bed only
-  - Total ~16-17mg over 6 weeks across three 5mg vials
-- Retatrutide (Reta): Monday only
-  - Weeks 1-2: 0.5mg | Weeks 3-4: 0.75mg | Weeks 5-6: 1.0mg
+- Retatrutide (Reta): Monday only — Weeks 1-2: 0.5mg | Weeks 3-4: 0.75mg | Weeks 5-6: 1.0mg
 - Creatine: 5g daily with food
-- Ipa + Reta: independent pathways, no meaningful interaction
-- Reta will suppress appetite — be intentional about hitting protein
-- Muscle gains from Ipa protocol are sticky post-phase-off as long as training and nutrition continue
+- Reta suppresses appetite — be intentional about hitting protein
 
 NUTRITION:
 - Protein target: 130-145g/day
-- Track throughout the day — Reta suppression makes this easy to miss
 
 EXERCISES TO AVOID (wrist):
 Push-ups, flat bench press, dips, any dorsiflexed wrist under load
@@ -1335,14 +1552,69 @@ Push-ups, flat bench press, dips, any dorsiflexed wrist under load
 WHEN ANSWERING:
 - Give specific, actionable answers
 - Reference her actual plan when relevant
-- If she asks about nutrition timing on lift days, remember morning Ipa requires 60-90 min fasted
-- Keep responses tight unless detail is clearly needed`;
+- Keep responses tight unless detail is clearly needed
+
+GENERATING NEW PROGRAMS:
+When asked to plan a next training phase, output the complete program as valid JSON wrapped in a code block tagged "program-json". The app will detect this and show a one-tap "Load" button.
+
+Schema:
+\`\`\`program-json
+{
+  "version": 1,
+  "name": "Phase 2 — Example",
+  "start": "YYYY-MM-DD",
+  "end": "YYYY-MM-DD",
+  "weekSchedule": {"0":"REST","1":"GH","2":"REST","3":"SB","4":"QA","5":"AC","6":"REST"},
+  "weekPhases": [
+    {"weeks":[1,2],"phase":"BASE","label":"Foundation"},
+    {"weeks":[3,4],"phase":"BUILD","label":"Build"},
+    {"weeks":[5],"phase":"DELOAD","label":"Deload"},
+    {"weeks":[6,7,8],"phase":"PEAK","label":"Peak"}
+  ],
+  "workouts": {
+    "GH_BASE": {"name":"Glutes + Hamstrings","exercises":[{"id":"p2_gh_b_hip_thrust","name":"Hip Thrust","sets":"4×12-15"}]},
+    "GH_BUILD": {"name":"Glutes + Hamstrings","exercises":[...]},
+    "GH_DELOAD": {"name":"Glutes + Hamstrings [Deload]","exercises":[...]},
+    "GH_PEAK": {"name":"Glutes + Hamstrings","exercises":[...]},
+    "SB_BASE": {}, "SB_BUILD": {}, "SB_DELOAD": {}, "SB_PEAK": {},
+    "QA_BASE": {}, "QA_BUILD": {}, "QA_DELOAD": {}, "QA_PEAK": {},
+    "AC_BASE": {}, "AC_BUILD": {}, "AC_DELOAD": {}, "AC_PEAK": {}
+  }
+}
+\`\`\`
+
+Rules for program JSON:
+- Exercise IDs must be globally unique: use "p{N}_{split}_{phase_abbrev}_{short_name}" (e.g., "p2_gh_b_rdl")
+- Include all 4 splits (GH/SB/QA/AC) with all phase variants referenced in weekPhases
+- Exercise objects: {id, name, sets, isAb (optional bool), isGlute (optional bool), note (optional string)}
+- Wrist constraint: NO push-ups, flat bench, dips, dorsiflexed wrist under load
+- Neutral grip only. Triceps: rope pushdowns and OH extension only.`;
 
 function getChatHistory(date) {
   return lsGet(`chat_${date}`, []);
 }
 function saveChatHistory(date, msgs) {
   lsSet(`chat_${date}`, msgs);
+}
+
+function formatChatContent(content) {
+  // Replace program-json blocks with a tidy preview card (hide raw JSON)
+  let result = '';
+  let lastIndex = 0;
+  const re = /```program-json\n([\s\S]*?)```/g;
+  let m;
+  while ((m = re.exec(content)) !== null) {
+    result += escHtml(content.slice(lastIndex, m.index));
+    try {
+      const p = JSON.parse(m[1]);
+      result += `<span class="program-preview-card"><strong>${escHtml(p.name || 'New Program')}</strong><br><span style="font-size:12px;color:var(--muted)">${escHtml(p.start)} → ${escHtml(p.end)}</span></span>`;
+    } catch(e) {
+      result += escHtml(m[0]);
+    }
+    lastIndex = m.index + m[0].length;
+  }
+  result += escHtml(content.slice(lastIndex));
+  return result;
 }
 
 function renderChat() {
@@ -1359,12 +1631,63 @@ function renderChat() {
     return;
   }
 
-  el.innerHTML = msgs.map(m => `
-    <div class="msg ${m.role}">
-      <div class="msg-bubble">${escHtml(m.content)}</div>
-      ${m.ts ? `<div class="msg-time">${fmtTime(m.ts)}</div>` : ''}
-    </div>
-  `).join('');
+  const loadedPrograms = lsGet('loaded_programs', []);
+
+  el.innerHTML = msgs.map((m, idx) => {
+    let extra = '';
+    if (m.role === 'assistant') {
+      const progMatch = m.content.match(/```program-json\n([\s\S]*?)```/);
+      if (progMatch) {
+        try {
+          const parsed = JSON.parse(progMatch[1]);
+          if (parsed.version === 1 && parsed.name && parsed.start) {
+            const alreadyLoaded = loadedPrograms.some(p => p.start === parsed.start && p.name === parsed.name);
+            extra = `<button class="program-load-btn" ${alreadyLoaded ? 'disabled' : ''} onclick="loadProgram(${idx}, this)">
+              ${alreadyLoaded ? '✓ Loaded' : `Load "${escHtml(parsed.name)}" →`}
+            </button>`;
+          }
+        } catch(e) {}
+      }
+    }
+    return `
+      <div class="msg ${m.role}">
+        <div class="msg-bubble">${formatChatContent(m.content)}</div>
+        ${extra}
+        ${m.ts ? `<div class="msg-time">${fmtTime(m.ts)}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function loadProgram(msgIdx, btn) {
+  const date = todayStr();
+  const msgs = getChatHistory(date);
+  const msg = msgs[msgIdx];
+  if (!msg) return;
+  const progMatch = msg.content.match(/```program-json\n([\s\S]*?)```/);
+  if (!progMatch) return;
+  try {
+    const parsed = JSON.parse(progMatch[1]);
+    const programs = lsGet('loaded_programs', []);
+    if (!programs.some(p => p.start === parsed.start && p.name === parsed.name)) {
+      programs.push(parsed);
+      lsSet('loaded_programs', programs);
+    }
+    btn.disabled = true;
+    btn.textContent = '✓ Loaded';
+    showToast(`"${parsed.name}" loaded ✓`);
+  } catch(e) {
+    showToast('Error loading program');
+  }
+}
+
+function showToast(message) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2200);
 }
 
 function escHtml(s) {
@@ -1432,7 +1755,7 @@ async function sendChat() {
         'anthropic-dangerous-direct-browser-access': 'true',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1024,
         system: SYSTEM_PROMPT,
         messages: apiMsgs,

@@ -816,6 +816,7 @@ function switchTab(tab) {
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('nav-' + tab).classList.add('active');
   activeTab = tab;
+  if (tab === 'today') renderToday();
   if (tab === 'log') renderLog();
   if (tab === 'program') renderProgram();
   if (tab === 'ai') {
@@ -1873,7 +1874,7 @@ function applyProgramPatch(msgIdx, btn) {
     btn.disabled = true;
     btn.textContent = '✓ Applied';
     showToast('Change applied ✓');
-    if (document.getElementById('tab-today').classList.contains('active')) renderToday();
+    renderToday();
   } catch(e) {
     showToast('Error applying change');
   }

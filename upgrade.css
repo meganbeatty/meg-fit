@@ -1,0 +1,22 @@
+summary { padding:16px; cursor:pointer; min-height:48px; font-size:15px; }
+summary small { display:block; color:var(--muted); font-size:12px; line-height:1.5; margin-top:5px; }
+.count { float:right; color:var(--primary-dark); font-size:13px; }
+.muted { color:var(--muted); font-size:13px; line-height:1.55; }
+.guidance { margin:16px 0; }
+.ex-check { width:44px; height:44px; color:white; font-size:22px; }
+.weight-label { display:flex; align-items:center; gap:10px; margin-top:8px; font-size:12px; color:var(--muted); }
+.weight-label input { width:100px; min-width:0; height:44px; border:1px solid var(--border); border-radius:10px; padding:8px; font-size:16px; }
+.history-row { border-bottom:1px solid var(--border); }
+.history-row p { font-size:13px; line-height:1.65; padding:4px 0; }
+.card-body h2 { font-size:17px; margin-bottom:8px; }
+.pilates-row { display:flex; align-items:center; padding:10px; border-bottom:1px solid var(--border); gap:8px; }
+.pilates-check { min-width:44px; min-height:44px; display:grid; place-items:center; }
+.pilates-check input { width:25px; height:25px; accent-color:var(--primary); }
+.pilates-row a { color:var(--text); text-decoration:none; padding:6px 0; }
+.pilates-row small { display:block; font-size:12px; color:var(--muted); line-height:1.5; margin-top:4px; }
+.video-link { display:block; color:var(--primary-dark); margin-top:12px; line-height:1.6; }
+button,summary,a,input,textarea { touch-action:manipulation; }
+:focus-visible { outline:3px solid #a34811; outline-offset:2px; }
+.overlay-sheet { max-height:90dvh; overflow-y:auto; padding-bottom:calc(24px + env(safe-area-inset-bottom)); }
+#backup-file { max-width:100%; margin-bottom:12px; }
+.chat-input { font-size:16px; }

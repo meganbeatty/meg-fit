@@ -1,0 +1,63 @@
+# Meg’s Fit upgrade — review before publishing
+
+Implemented on branch `upgrade/ppl-pilates`, based on public main commit `077e82ab6593c12ec10ad4c70a2e9251c54c5540`. The supplied ZIP and pre-existing workspace index/sw matched that source. Nothing has been pushed or deployed.
+
+## Changes
+
+- Exact PULL/PUSH/LEGS program, available anytime; expandable cards retain the existing coral visual identity.
+- One pounds field per exercise, per-DB labels, optional added load for bodyweight, optional single-arm pulldown, and an explicit Finish session action.
+- Persisted unfinished workouts; each completed workout gets a unique ID, completion timestamp, and exercises/weights. Repeated and unchanged-weight workouts count as separate sessions.
+- Today / Log / Pilates / Progress / Ask AI navigation. Log deduplicates lateral raises and keeps old lifts accessible. Progress distinguishes new dated sessions from legacy weekly records.
+- One reusable 25-day Pilates checklist, Next Up, per-day check/uncheck, and confirmed Uncheck all. No explicit rounds or calendar dates. All 25 IDs/titles were retrieved from the official YouTube playlist on November 3, 2026 and checked against their numbered titles. Full original titles remain in `pilates.js`; the UI omits repetitive challenge/day prefixes.
+- Original protein keypad and date-based notes retained. Wrist precautions retained. Dated phase generation and program-apply controls retired; old data/chats stay in storage.
+- Credential-free JSON backup download and file/paste restore.
+- Restored relative manifest and v5 service worker with a complete local offline shell and network-first updates.
+
+## Data preservation and restore behavior
+
+No automatic destructive migration and no localStorage clearing. `weight_*`, `wt_history`, legacy `checks_*`, loaded programs, overrides and chat history are not rewritten merely by opening the app or finishing workouts. The new `megfit_v5` key stores drafts, sessions, and Pilates checks. Existing equivalent exercise IDs supply the first prefills; different rows/curls/machines get distinct IDs. Weight history is recorded only on Finish session, never merely on displaying a prefill or toggling a check.
+
+Restore validates supported v2/v5 data before writing. Existing legacy weights/overrides win conflicts. Session IDs deduplicate; existing unfinished workouts win conflicts; Pilates checks combine; lists and weekly records merge without identical duplicates. Protein entries merge and totals recalculate. Conflicting notes append with a restored-note label. The UI explains the merge before confirmation. API keys are ignored on restore and omitted/redacted on export. Export before restoring if you want a separate rollback copy. Restoring an older backup intentionally does not uncheck current Pilates days; use the checklist or Uncheck all to do that.
+
+The supplied private backup was used only in an in-memory local test. It and its credentials are not included in the source, ZIP, patch, or test fixtures. Local preview contains synthetic test records; it is a different origin from the iPhone app.
+
+## Validation
+
+Run from this checkout:
+
+```sh
+node --test tests/*.test.cjs
+```
+
+Fourteen automated tests cover exact workout counts/identity distinctions, playlist endpoints and uniqueness, legacy prefills without historical writes, optional skip, bodyweight, reload/undo, same-week repeated sessions, unchanged and changed weights, duplicate finish protection, progress/log rendering, Pilates completion/reset/persistence, credential exclusion, idempotent restore, malformed backup rejection, protein, AI request success/error mocks, failed storage writes, HTML escaping, and service-worker install/cache/update/offline routing.
+
+To also exercise a private legacy backup locally without copying it into the repo:
+
+```sh
+LEGACY_BACKUP=/absolute/path/to/meg-fit-backup.json node --test tests/*.test.cjs
+```
+
+Passed with the supplied backup. Browser QA at 390×844 and 320×640 verified all workout cards, input/check persistence after reload, optional skip and bodyweight finish, session history, all five tabs, Pilates check/undo/Next Up, legacy backup paste/merge, actual backup download, protein, and scrolling/navigation. No horizontal overflow at 320px; bottom targets were 64×71px. No browser console errors observed. AI transport and errors were mocked; no paid Anthropic request was sent. Offline behavior was tested in a service-worker harness; a real iPhone Home Screen upgrade still needs device verification after approved publication.
+
+## AI security tradeoff
+
+The existing direct-browser Anthropic integration remains: the user-configured key is in localStorage and sent in an HTTPS request header to Anthropic. Scripts running on the same origin can read it, as can someone with access to browser developer tools. The settings UI discloses this. No key is committed, exported, or logged. A server-side proxy would change the requested architecture and is not introduced.
+
+## Review and publishing — approval required
+
+Authenticated CLI identity was verified as `meganbeatty`. GitHub Pages settings were read successfully: legacy build, branch `main`, path `/`, URL `https://meganbeatty.github.io/meg-fit/`. No settings were changed.
+
+Before publication, on the existing iPhone shortcut, export a fresh backup via **Ask AI → API Key → Data Backup → Export All Data** and keep it securely. The old app may include its API key in that file; do not upload it to GitHub or share it publicly.
+
+After explicit review/approval, either publish the reviewed branch with authenticated Git or use the manual path:
+
+1. Extract `meg-fit-upgrade-files.zip` locally.
+2. Sign into GitHub as **meganbeatty** and open `meganbeatty/meg-fit`.
+3. Choose **Add file → Upload files**. Upload the seven application files at the repository root: `index.html`, `app.js`, `legacy-names.js`, `pilates.js`, `upgrade.css`, `manifest.json`, `sw.js`. Do not upload the ZIP itself, private backups, or a surrounding folder. The documentation/tests may be uploaded too, but are not required to run the app.
+4. Commit to a new branch and review the comparison. Merge into `main` only after approval. That merge triggers the live Pages deployment. Keep `index_v2.html` unchanged.
+5. Wait for the Pages build, then verify the live URL and all seven assets under `/meg-fit/`.
+6. On the iPhone, open the existing Home Screen shortcut online, close it fully, and reopen it so the newly installed worker/app can take control. If necessary repeat once. **Do not delete the shortcut, reinstall, clear site data, or clear localStorage.** Check familiar weights, legacy history, a new session and Pilates persistence on the device before relying on it offline.
+
+For local preview: `python3 -m http.server 8765 --bind 127.0.0.1` from this folder, then open `http://127.0.0.1:8765/`. No install/build required.
+
+Rollback source is the original main commit above. If reverting after deployment, publish the old UI with a newly bumped service-worker cache version so devices receive it. Preserve the new `megfit_v5` key; never erase storage as a rollback method. Old UI will not display new sessions, but those records remain available when the upgraded UI is restored.

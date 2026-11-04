@@ -1,27 +1,17 @@
-const CACHE = 'meg-fit-v4';
-const ASSETS = ['./', './index.html', './manifest.json'];
-
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
-  self.skipWaiting();
+const CACHE = 'meg-fit-v5';
+const ASSETS = ['./', './index.html', './manifest.json', './app.js', './pilates.js', './legacy-names.js', './upgrade.css'];
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
-
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
-  self.clients.claim();
+self.addEventListener('activate', event => {
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('meg-fit-') && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim()));
 });
-
-self.addEventListener('fetch', e => {
-  if (e.request.url.includes('anthropic.com')) return;
-  e.respondWith(
-    caches.match(e.request).then(cached => cached ||
-      fetch(e.request).then(res => {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return res;
-      })
-    )
-  );
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  if (event.request.method !== 'GET' || url.origin !== self.location.origin || !ASSETS.some(path => new URL(path, self.registration.scope).pathname === url.pathname)) return;
+  // Network first: existing Home Screen installs receive updates, with a cached offline shell.
+  event.respondWith(fetch(event.request).then(response => {
+    if (response.ok) { const copy = response.clone(); event.waitUntil(caches.open(CACHE).then(cache => cache.put(event.request, copy))); }
+    return response;
+  }).catch(() => caches.match(event.request).then(cached => cached || (event.request.mode === 'navigate' ? caches.match('./index.html') : Response.error()))));
 });

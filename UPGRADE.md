@@ -11,7 +11,7 @@ Implemented on branch `upgrade/ppl-pilates`, based on public main commit `077e82
 - One reusable 25-day Pilates checklist, Next Up, per-day check/uncheck, and confirmed Uncheck all. No explicit rounds or calendar dates. All 25 IDs/titles were retrieved from the official YouTube playlist on November 3, 2026 and checked against their numbered titles. Full original titles remain in `pilates.js`; the UI omits repetitive challenge/day prefixes.
 - Original protein keypad and date-based notes retained. Standalone wrist blurb removed at review; AI wrist precautions retained. Dated phase generation and program-apply controls retired; old data/chats stay in storage.
 - Credential-free JSON backup download and file/paste restore.
-- Restored relative manifest and v9 service worker with a complete local offline shell and network-first updates.
+- Restored relative manifest and v10 service worker with a complete local offline shell and network-first updates.
 
 ## Data preservation and restore behavior
 
@@ -83,3 +83,9 @@ Four added tests cover the proactive year/hidden months, Pilates completion/undo
 Each week now has three read-only automatic lift checkboxes (Pull/Push/Legs) and one numeric Pilates total. Finishing at least one session checks the relevant lift; additional saved sessions remain intact in history but do not change the checkbox. The displayed weekly target is one of each lift plus 5–6 Pilates sessions. Removed count-based shading, aggregate completion heading, and tap-for-dates controls. Pilates reset/undo behavior is unchanged. Updated coverage verifies the binary lift display with repeated sessions, the Pilates total, and absence of drill-down controls. All 21 tests pass; mobile checks confirm no overflow at 320px.
 
 Pilates weekly totals now use coral for 0, yellow for 1–3, light green for 4, and rich green for 5 or more (including the 5–6 target). Numeric totals remain visible. All 22 tests pass, including threshold boundaries.
+
+## Verified Pilates subtitles
+
+All 25 day links and Next Up now show `Minutes | Focus | Equipment`. Removed promotional title suffixes. Full video lengths were retrieved from each official YouTube watch page’s player metadata and rounded to the nearest minute for display; exact seconds are stored in `pilates.js` and available in the link tooltip. The UI explains rounding and that equipment lists exclude a mat. Titles/descriptions verify props for 23 videos; Day 15’s spoken intro at 0:35 confirms no equipment, and Day 20’s intro at 0:26–0:37 plus 1:45–1:48 confirms weights, one per hand. See `PILATES_SOURCES.md` for all 25 linked sources, exact runtimes and equipment evidence. Original titles, video IDs, ordering and checkbox storage are unchanged.
+
+All 23 tests pass, including metadata completeness and subtitle rendering. All 25 stored runtimes were compared with the retrieved official metadata. Browser review at 390px and 320px confirms the condensed labels and no horizontal overflow. No deployment has occurred.

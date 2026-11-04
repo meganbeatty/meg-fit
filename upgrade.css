@@ -65,3 +65,6 @@ button,summary,a,input,textarea { touch-action:manipulation; }
 .activity-quantity.pilates-building { background:#f4ce73; color:#634807; }
 .activity-quantity.pilates-close { background:#b5dfbd; color:#265d36; }
 .activity-quantity.pilates-target { background:#238575; color:white; }
+
+.pilates-runtime-note { font-size:11px; line-height:1.5; color:var(--muted); margin-top:10px; }
+.pilates-row small { font-size:13px; }

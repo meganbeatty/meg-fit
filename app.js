@@ -102,26 +102,22 @@ function activityEntries(){
  return [...s.sessions.map(x=>({id:x.id,type:x.workout,date:x.localDate||localDateOf(x.completedAt),label:x.workout})),...s.pilatesEvents.filter(x=>!x.undoneAt).map(x=>({id:x.id,type:'Pilates',date:x.localDate||localDateOf(x.completedAt),label:'Pilates · Day '+x.day}))];
 }
 function weekEntries(start){const end=shiftDate(start,7);return activityEntries().filter(x=>x.date>=start&&x.date<end);}
-function activityIntensity(n){return n===0?'none':n===1?'one':n===2?'two':'many';}
-function showActivityWeek(start){
- const entries=weekEntries(start).sort((a,b)=>a.date.localeCompare(b.date));
- document.getElementById('activity-detail').innerHTML=`<h2>Week of ${dated(start)}</h2>`+(entries.length?entries.map(x=>`<p>${dated(x.date)} · ${x.label}</p>`).join(''):'<p class="muted">No dated completions recorded this week.</p>');
- document.getElementById('activity-detail').scrollIntoView?.({behavior:'smooth',block:'nearest'});
-}
 function moveActivity(offset){activityOffset=Math.max(0,activityOffset+offset);renderActivity();}
 function renderActivity(){
  const current=mondayOf(todayStr());
  const types=['PULL','PUSH','LEGS','Pilates'];
- let rows='';let total=0;
+ let rows='';
  for(let i=0;i<12;i++){
-   const start=shiftDate(current,-7*(activityOffset+i));const entries=weekEntries(start);total+=entries.length;
+   const start=shiftDate(current,-7*(activityOffset+i));const entries=weekEntries(start);
    rows+=`<tr><th scope="row">${new Date(start+'T12:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'})}<small>${start.slice(0,4)}${start===current?' · now':''}</small></th>`+types.map(type=>{
      const n=entries.filter(e=>e.type===type).length;
-     return `<td><button class="activity-cell activity-${activityIntensity(n)}" aria-label="Week of ${start}, ${type}: ${n} completions" onclick="showActivityWeek('${start}')">${n||'–'}</button></td>`;
+     return type==='Pilates'
+       ? `<td><span class="activity-cell activity-quantity" role="img" aria-label="Week of ${start}, Pilates: ${n} sessions; target 5 to 6">${n}</span></td>`
+       : `<td><span class="activity-cell activity-lift"><input type="checkbox" disabled ${n>0?'checked':''} aria-label="Week of ${start}, ${type}: ${n>0?'completed':'not completed'}"></span></td>`;
    }).join('')+'</tr>';
  }
  const unknown=state().pilates.filter((done,i)=>done&&!state().pilatesActive[i]).length;
- document.getElementById('activity-content').innerHTML=header('Activity','Your week-by-week consistency')+`<section class="section card"><div class="card-body"><h2>${total} completions</h2><p class="muted">Across these 12 weeks · weeks start Monday</p><div class="activity-controls"><button onclick="moveActivity(12)">← Earlier</button><button onclick="moveActivity(-12)" ${activityOffset===0?'disabled':''}>Later →</button></div><table class="activity-grid"><thead><tr><th scope="col">Week of</th>${types.map(t=>`<th scope="col">${t==='Pilates'?t:t[0]+t.slice(1).toLowerCase()}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table><p class="muted">Each square counts completed sessions. Darker = more. Tap a week’s square for dates.</p></div></section><section class="section card"><div class="card-body" id="activity-detail" aria-live="polite"><h2>Your completed workouts</h2><p class="muted">Lift sessions appear when you finish them. Pilates appears when you check a day done. Undo removes that completion; “Uncheck all” keeps history for your next pass.</p>${unknown?`<p class="muted">${unknown} previously checked Pilates day(s) have no recorded date and aren’t assigned to a week.</p>`:''}<p class="muted">Legacy lifting checkmarks are not counted as dated sessions.</p></div></section>`;
+ document.getElementById('activity-content').innerHTML=header('Activity','Your week-by-week consistency')+`<section class="section card"><div class="card-body"><h2>Your weekly rhythm</h2><p class="muted">1 Pull · 1 Push · 1 Legs · 5–6 Pilates<br>Weeks start Monday</p><div class="activity-controls"><button onclick="moveActivity(12)">← Earlier</button><button onclick="moveActivity(-12)" ${activityOffset===0?'disabled':''}>Later →</button></div><table class="activity-grid"><thead><tr><th scope="col">Week of</th>${types.map(t=>`<th scope="col">${t==='Pilates'?t:t[0]+t.slice(1).toLowerCase()}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table><p class="muted">Lift checkmarks fill automatically when you finish a session. The Pilates box shows your weekly total.</p></div></section><section class="section card"><div class="card-body activity-notes"><h2>Your completed workouts</h2><p class="muted">Lift sessions appear when you finish them. Pilates appears when you check a day done. Undo removes that completion; “Uncheck all” keeps history for your next pass.</p>${unknown?`<p class="muted">${unknown} previously checked Pilates day(s) have no recorded date and aren’t assigned to a week.</p>`:''}<p class="muted">Legacy lifting checkmarks are not counted as dated sessions.</p></div></section>`;
 }
 function mergePilatesEvents(a,b){
  const entries=new Map();

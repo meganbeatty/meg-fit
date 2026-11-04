@@ -11,7 +11,7 @@ Implemented on branch `upgrade/ppl-pilates`, based on public main commit `077e82
 - One reusable 25-day Pilates checklist, Next Up, per-day check/uncheck, and confirmed Uncheck all. No explicit rounds or calendar dates. All 25 IDs/titles were retrieved from the official YouTube playlist on November 3, 2026 and checked against their numbered titles. Full original titles remain in `pilates.js`; the UI omits repetitive challenge/day prefixes.
 - Original protein keypad and date-based notes retained. Standalone wrist blurb removed at review; AI wrist precautions retained. Dated phase generation and program-apply controls retired; old data/chats stay in storage.
 - Credential-free JSON backup download and file/paste restore.
-- Restored relative manifest and v7 service worker with a complete local offline shell and network-first updates.
+- Restored relative manifest and v8 service worker with a complete local offline shell and network-first updates.
 
 ## Data preservation and restore behavior
 
@@ -77,3 +77,7 @@ Activity shows 12 Monday-based weeks per page with Pull, Push, Legs and Pilates 
 Pilates now adds optional `pilatesEvents` and `pilatesActive` fields to the existing version-5 state without changing storage keys or rewriting old records on read. Individual undo timestamps a cancellation so it is removed from weekly totals; reset-all clears the checklist association while retaining completed activity for future passes. Old checked days without dates remain undated. Backup restore merges events by ID; cancellation records prevent stale backups from resurrecting undone activity.
 
 Four added tests cover the proactive year/hidden months, Pilates completion/undo/reset/repeat persistence, Monday boundaries across New Year, and backward-compatible/idempotent activity restore. Browser QA confirmed year options, hidden months, weekly details, undo updates, paging and no horizontal overflow at 320px. All 21 tests pass. Nothing has been deployed.
+
+## Simplified Activity boxes
+
+Each week now has three read-only automatic lift checkboxes (Pull/Push/Legs) and one numeric Pilates total. Finishing at least one session checks the relevant lift; additional saved sessions remain intact in history but do not change the checkbox. The displayed weekly target is one of each lift plus 5–6 Pilates sessions. Removed count-based shading, aggregate completion heading, and tap-for-dates controls. Pilates reset/undo behavior is unchanged. Updated coverage verifies the binary lift display with repeated sessions, the Pilates total, and absence of drill-down controls. All 21 tests pass; mobile checks confirm no overflow at 320px.

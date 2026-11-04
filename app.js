@@ -102,6 +102,7 @@ function activityEntries(){
  return [...s.sessions.map(x=>({id:x.id,type:x.workout,date:x.localDate||localDateOf(x.completedAt),label:x.workout})),...s.pilatesEvents.filter(x=>!x.undoneAt).map(x=>({id:x.id,type:'Pilates',date:x.localDate||localDateOf(x.completedAt),label:'Pilates · Day '+x.day}))];
 }
 function weekEntries(start){const end=shiftDate(start,7);return activityEntries().filter(x=>x.date>=start&&x.date<end);}
+function pilatesActivityBand(n){return n===0?'zero':n<=3?'building':n===4?'close':'target';}
 function moveActivity(offset){activityOffset=Math.max(0,activityOffset+offset);renderActivity();}
 function renderActivity(){
  const current=mondayOf(todayStr());
@@ -112,7 +113,7 @@ function renderActivity(){
    rows+=`<tr><th scope="row">${new Date(start+'T12:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'})}<small>${start.slice(0,4)}${start===current?' · now':''}</small></th>`+types.map(type=>{
      const n=entries.filter(e=>e.type===type).length;
      return type==='Pilates'
-       ? `<td><span class="activity-cell activity-quantity" role="img" aria-label="Week of ${start}, Pilates: ${n} sessions; target 5 to 6">${n}</span></td>`
+       ? `<td><span class="activity-cell activity-quantity pilates-${pilatesActivityBand(n)}" role="img" aria-label="Week of ${start}, Pilates: ${n} sessions; target 5 to 6">${n}</span></td>`
        : `<td><span class="activity-cell activity-lift"><input type="checkbox" disabled ${n>0?'checked':''} aria-label="Week of ${start}, ${type}: ${n>0?'completed':'not completed'}"></span></td>`;
    }).join('')+'</tr>';
  }

@@ -1,4 +1,4 @@
-const CACHE = 'meg-fit-v8';
+const CACHE = 'meg-fit-v9';
 const ASSETS = ['./', './index.html', './manifest.json', './app.js', './pilates.js', './legacy-names.js', './upgrade.css'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));

@@ -60,3 +60,8 @@ button,summary,a,input,textarea { touch-action:manipulation; }
 @media(max-width:350px) { .activity-grid { border-spacing:3px; } .activity-grid th:first-child { width:58px; } }
 .activity-lift input { appearance:none; -webkit-appearance:none; border:2px solid #cbd5e1; border-radius:5px; background:#fff; }
 .activity-lift input:checked { border-color:var(--primary); background-color:var(--primary); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5 12 4 4 10-10' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+
+.activity-quantity.pilates-zero { background:#ffe0d4; color:#843f2e; }
+.activity-quantity.pilates-building { background:#f4ce73; color:#634807; }
+.activity-quantity.pilates-close { background:#b5dfbd; color:#265d36; }
+.activity-quantity.pilates-target { background:#238575; color:white; }

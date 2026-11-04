@@ -45,3 +45,17 @@ button,summary,a,input,textarea { touch-action:manipulation; }
 .protein-unavailable { background:transparent; }
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 @media(max-width:350px) { .workout .card-body { padding:12px; } .workout .exercise-item { gap:7px; } .workout .weight-label { flex-basis:66px; } .workout .weight-label input { width:66px; } .workout .ex-name { font-size:13px; } }
+.activity-grid { width:100%; border-spacing:5px; table-layout:fixed; margin:12px 0; }
+.activity-grid th { text-align:center; font-size:12px; color:var(--muted); }
+.activity-grid th:first-child { width:66px; text-align:left; }
+.activity-grid th small { display:block; font-size:10px; font-weight:400; margin-top:3px; }
+.activity-cell { width:100%; min-height:44px; border:0; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; }
+.activity-none { background:#e9edf2; color:#64748b; }
+.activity-one { background:#ffe0d4; color:#843f2e; }
+.activity-two { background:#ffa18b; color:#602619; }
+.activity-many { background:#b84833; color:white; }
+.activity-controls { display:flex; justify-content:space-between; margin-top:12px; gap:12px; }
+.activity-controls button { min-height:44px; border:1px solid var(--border); border-radius:8px; background:white; color:var(--text); padding:8px 14px; }
+.activity-controls button:disabled { opacity:.4; }
+#activity-detail p { margin-top:8px; font-size:13px; line-height:1.6; }
+@media(max-width:350px) { .activity-grid { border-spacing:3px; } .activity-grid th:first-child { width:58px; } }

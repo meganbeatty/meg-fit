@@ -468,6 +468,7 @@ html, body { height: 100%; background: var(--bg); font-family: -apple-system, Bl
     </div>
   </div>
 
+  <div id="tab-activity" class="tab-panel"><div id="activity-content"></div></div>
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-btn active" id="nav-today" onclick="switchTab('today')">
@@ -483,6 +484,7 @@ html, body { height: 100%; background: var(--bg); font-family: -apple-system, Bl
       </svg>
       <span class="nav-label">Log</span>
     </button>
+    <button class="nav-btn" id="nav-activity" onclick="switchTab('activity')"><span style="font-size:24px" aria-hidden="true">▦</span><span class="nav-label">Activity</span></button>
     <button class="nav-btn" id="nav-ai" onclick="switchTab('ai')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>

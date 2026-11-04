@@ -7,11 +7,11 @@ Implemented on branch `upgrade/ppl-pilates`, based on public main commit `077e82
 - Exact PULL/PUSH/LEGS program, available anytime; expandable cards retain the existing coral visual identity.
 - One pounds field per exercise, per-DB labels, optional added load for bodyweight, optional single-arm pulldown, and an explicit Finish session action.
 - Persisted unfinished workouts; each completed workout gets a unique ID, completion timestamp, and exercises/weights. Repeated and unchanged-weight workouts count as separate sessions.
-- Lift / Pilates / Log / Ask navigation. Log deduplicates lateral raises, keeps old lifts accessible, and distinguishes new dated history from legacy weekly records. The redundant Progress screen is removed.
+- Lift / Pilates / Log / Activity / Ask navigation. Log deduplicates lateral raises, keeps old lifts accessible, and distinguishes new dated history from legacy weekly records. The redundant Progress screen is removed.
 - One reusable 25-day Pilates checklist, Next Up, per-day check/uncheck, and confirmed Uncheck all. No explicit rounds or calendar dates. All 25 IDs/titles were retrieved from the official YouTube playlist on November 3, 2026 and checked against their numbered titles. Full original titles remain in `pilates.js`; the UI omits repetitive challenge/day prefixes.
 - Original protein keypad and date-based notes retained. Standalone wrist blurb removed at review; AI wrist precautions retained. Dated phase generation and program-apply controls retired; old data/chats stay in storage.
 - Credential-free JSON backup download and file/paste restore.
-- Restored relative manifest and v6 service worker with a complete local offline shell and network-first updates.
+- Restored relative manifest and v7 service worker with a complete local offline shell and network-first updates.
 
 ## Data preservation and restore behavior
 
@@ -29,7 +29,7 @@ Run from this checkout:
 node --test tests/*.test.cjs
 ```
 
-Seventeen automated tests cover exact workout counts/identity distinctions, playlist endpoints and uniqueness, legacy prefills without historical writes, optional skip, bodyweight, reload/undo, same-week repeated sessions, unchanged and changed weights, duplicate finish protection, log rendering, Pilates completion/reset/persistence, credential exclusion, idempotent restore, malformed backup rejection, protein, AI request success/error mocks, failed storage writes, HTML escaping, and service-worker install/cache/update/offline routing.
+Twenty-one automated tests cover exact workout counts/identity distinctions, playlist endpoints and uniqueness, legacy prefills without historical writes, optional skip, bodyweight, reload/undo, same-week repeated sessions, unchanged and changed weights, duplicate finish protection, log rendering, Pilates completion/reset/persistence, credential exclusion, idempotent restore, malformed backup rejection, protein, AI request success/error mocks, failed storage writes, HTML escaping, and service-worker install/cache/update/offline routing.
 
 To also exercise a private legacy backup locally without copying it into the repo:
 
@@ -37,7 +37,7 @@ To also exercise a private legacy backup locally without copying it into the rep
 LEGACY_BACKUP=/absolute/path/to/meg-fit-backup.json node --test tests/*.test.cjs
 ```
 
-Passed with the supplied backup. Browser QA at 390×844 and 320×640 verified all workout cards, input/check persistence after reload, optional skip and bodyweight finish, session history, all four tabs, Pilates check/undo/Next Up, legacy backup paste/merge, actual backup download, protein, and scrolling/navigation. No horizontal overflow at 320px; bottom targets were 64×71px. No browser console errors observed. AI transport and errors were mocked; no paid Anthropic request was sent. Offline behavior was tested in a service-worker harness; a real iPhone Home Screen upgrade still needs device verification after approved publication.
+Passed with the supplied backup. Browser QA at 390×844 and 320×640 verified all workout cards, input/check persistence after reload, optional skip and bodyweight finish, session history, all five tabs, Pilates check/undo/Next Up, legacy backup paste/merge, actual backup download, protein, and scrolling/navigation. No horizontal overflow at 320px; bottom targets were 64×71px. No browser console errors observed. AI transport and errors were mocked; no paid Anthropic request was sent. Offline behavior was tested in a service-worker harness; a real iPhone Home Screen upgrade still needs device verification after approved publication.
 
 ## AI security tradeoff
 
@@ -67,3 +67,13 @@ Rollback source is the original main commit above. If reverting after deployment
 Weight inputs now sit in a fixed, right-aligned column beside each lift, reducing row height. Log includes a protein calendar with months as rows and days as columns, horizontally scrollable on phones. Years with logged data are selectable. Colors represent 120g+, 100–119g, 80–99g, and under 80g; unlogged days are neutral, and future/nonexistent dates are blank. Tapping a cell shows its date and exact total. The overlapping ranges in the feedback were interpreted as these nonoverlapping bands. Historical protein records are read directly and never rewritten by the calendar.
 
 Additional tests verify band boundaries (including 80, 100 and 120), unlogged versus zero, leap days, future dates, calendar reads without data mutation, and the four-tab order. Rechecked the attached backup locally; credentials remain excluded. Revised UI tested at 390px and 320px, including persisted weight input and day detail selection.
+
+## Weekly activity and calendar follow-up
+
+Protein now proactively offers 2027 (and the next calendar year as time advances). The 2026 view shows November–December only; January–October records remain in storage and backups.
+
+Activity shows 12 Monday-based weeks per page with Pull, Push, Legs and Pilates counts. Earlier/Later navigation and tappable week details expose actual completion dates. Existing dated lifting sessions are included; legacy week/check records are not misrepresented as sessions. New completions save a local calendar date to keep week grouping stable across time zones.
+
+Pilates now adds optional `pilatesEvents` and `pilatesActive` fields to the existing version-5 state without changing storage keys or rewriting old records on read. Individual undo timestamps a cancellation so it is removed from weekly totals; reset-all clears the checklist association while retaining completed activity for future passes. Old checked days without dates remain undated. Backup restore merges events by ID; cancellation records prevent stale backups from resurrecting undone activity.
+
+Four added tests cover the proactive year/hidden months, Pilates completion/undo/reset/repeat persistence, Monday boundaries across New Year, and backward-compatible/idempotent activity restore. Browser QA confirmed year options, hidden months, weekly details, undo updates, paging and no horizontal overflow at 320px. All 21 tests pass. Nothing has been deployed.

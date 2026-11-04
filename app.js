@@ -9,10 +9,10 @@ const PLAN = {
 };
 const CURRENT = Object.fromEntries(Object.values(PLAN).flatMap(p=>p.exercises).map(e=>[e[0],e]));
 const STATE_KEY='megfit_v5';
-const emptyState=()=>({version:5,drafts:{},sessions:[],pilates:Array(25).fill(false)});
+const emptyState=()=>({version:5,drafts:{},sessions:[],pilates:Array(25).fill(false),pilatesEvents:[],pilatesActive:{}});
 function lsGet(k,d=null){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v);}catch{return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{showToast('Could not save. Storage may be full. Export a backup before closing.');throw new Error('Storage write failed');}}
-function state(){return lsGet(STATE_KEY,emptyState());}
+function state(){const s=lsGet(STATE_KEY,emptyState());return {...s,pilatesEvents:s.pilatesEvents||[],pilatesActive:s.pilatesActive||{}};}
 function escHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function showToast(s){document.querySelector('.toast')?.remove();const el=document.createElement('div');el.className='toast';el.role='status';el.textContent=s;document.body.append(el);setTimeout(()=>el.remove(),4000);}
 function latest(id){const rows=state().sessions.flatMap(s=>s.exercises.filter(e=>e.id===id).map(e=>({...e,date:s.completedAt}))).sort((a,b)=>a.date.localeCompare(b.date));return rows.at(-1)||lsGet('weight_'+id,{weight:'',updatedAt:''});}
@@ -23,10 +23,10 @@ function toggleExercise(key,id){const s=state();s.drafts[key] ||= draft(key);con
 function finishSession(key){const s=state(),d=s.drafts[key];if(!d||PLAN[key].exercises.some(e=>e[3]!=='optional'&&!d.checks.includes(e[0])))return showToast('Check off each required exercise first. The optional exercise may be skipped.');
  const exercises=PLAN[key].exercises.filter(e=>d.checks.includes(e[0])).map(e=>({id:e[0],weight:d.weights[e[0]]===''?null:Number(d.weights[e[0]]),unit:e[3]==='db'?'lb per dumbbell':'lb'}));
  if(exercises.some(e=>e.weight!==null&&(!Number.isFinite(e.weight)||e.weight<0)))return showToast('Enter valid, nonnegative weights.');
- if(!s.sessions.some(x=>x.id===d.id))s.sessions.push({id:d.id,workout:key,startedAt:d.startedAt,completedAt:new Date().toISOString(),exercises});delete s.drafts[key];lsSet(STATE_KEY,s);renderToday();showToast(key+' saved. Your next session is ready.');}
+ if(!s.sessions.some(x=>x.id===d.id))s.sessions.push({id:d.id,workout:key,startedAt:d.startedAt,completedAt:new Date().toISOString(),localDate:todayStr(),exercises});delete s.drafts[key];lsSet(STATE_KEY,s);renderToday();showToast(key+' saved. Your next session is ready.');}
 let activeTab='today',proteinInput='',chatBusy=false;
 function header(title,sub){return `<div class="page-header"><h1>${title}</h1><div class="sub">${sub}</div></div>`;}
-function switchTab(tab){document.querySelectorAll('.tab-panel,.nav-btn').forEach(e=>e.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');document.getElementById('nav-'+tab).classList.add('active');activeTab=tab;({today:renderToday,log:renderLog,pilates:renderPilates,ai:renderChat})[tab]();}
+function switchTab(tab){document.querySelectorAll('.tab-panel,.nav-btn').forEach(e=>e.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');document.getElementById('nav-'+tab).classList.add('active');activeTab=tab;({today:renderToday,log:renderLog,pilates:renderPilates,activity:renderActivity,ai:renderChat})[tab]();}
 function renderToday(){const opens=[...document.querySelectorAll('.workout[open]')].map(e=>e.dataset.key);document.getElementById('today-content').innerHTML=header("Meg's Fit",'Your pace. Your next session.')+Object.entries(PLAN).map(([k,p])=>{const d=draft(k);return `<div class="section"><details class="card workout" data-key="${k}" ${opens.includes(k)?'open':''}><summary><strong>${k}</strong><span id="count-${k}" class="count">${d.checks.length}/${p.exercises.length}</span><small>${p.subtitle}</small></summary><div class="card-body"><p class="muted">Warm up with an easy walk or row and dynamic movement.</p>${p.exercises.map(e=>`<div class="exercise-item"><button class="ex-check ${d.checks.includes(e[0])?'checked':''}" data-check="${k}:${e[0]}" aria-label="Complete ${escHtml(e[1])}" aria-pressed="${d.checks.includes(e[0])}" onclick="toggleExercise('${k}','${e[0]}')">${d.checks.includes(e[0])?'✓':''}</button><div class="ex-info"><div class="ex-name">${e[1]}</div><div class="ex-sets">${e[2]}${e[3]==='optional'?' · Optional':''}</div>${k==='PUSH'&&e[3]==='db'?'<div class="ex-note">Neutral grip · only if comfortable</div>':''}</div><label class="weight-label"><span>${e[3]==='bodyweight'?'Added lb':e[3]==='db'?'lb / DB':'lb'}</span><input type="number" min="0" step="any" inputmode="decimal" aria-label="${escHtml(e[1])} weight in ${e[3]==='db'?'pounds per dumbbell':'pounds'}" placeholder="${e[3]==='bodyweight'?'Bodyweight':'—'}" value="${escHtml(d.weights[e[0]]??'')}" oninput="saveWeight('${k}','${e[0]}',this.value)"></label></div>`).join('')}<p class="muted guidance">Finish most sets with 1–3 reps in reserve. Reach the top of the rep range with good form across sets, then add a little weight. Rest 2–3 min on compounds; 60–90 sec on accessories.</p><button class="btn-primary" onclick="finishSession('${k}')">Finish ${k} session</button></div></details></div>`}).join('')+renderProteinSection(todayStr())+renderNotesSection(todayStr());attachProteinHandlers(todayStr());attachNotesHandler(todayStr());document.querySelectorAll('.workout').forEach(el=>el.addEventListener('toggle',()=>{if(el.open)ensureDraft(el.dataset.key);}));}
 function dated(v){return v?new Date(v.length===10?v+'T12:00:00':v).toLocaleDateString(): 'Date not recorded';}
 function weightText(v,e){return v===null||v===''||v===undefined?(e?.[3]==='bodyweight'?'Bodyweight':'Weight not recorded'):`${escHtml(v)} lb${e?.[3]==='db'?' / DB':''}`;}
@@ -54,10 +54,10 @@ function changeProteinYear(year) {
 }
 function renderProteinCalendar() {
   const today = todayStr();
-  const years = [...new Set([Number(today.slice(0,4)), proteinYear, ...Object.keys(localStorage).filter(k => /^protein_\d{4}-\d{2}-\d{2}$/.test(k)).map(k => Number(k.slice(8,12)))])].sort((a,b) => b-a);
+  const years = [...new Set([2026, 2027, Number(today.slice(0,4)), Number(today.slice(0,4))+1, proteinYear, ...Object.keys(localStorage).filter(k => /^protein_\d{4}-\d{2}-\d{2}$/.test(k)).map(k => Number(k.slice(8,12)))])].sort((a,b) => b-a);
   const bands = [['high','120g+'],['good','100–119g'],['mid','80–99g'],['low','Under 80g'],['unlogged','Not logged']];
   let rows = '';
-  for (let month = 0; month < 12; month++) {
+  for (let month = proteinYear === 2026 ? 10 : 0; month < 12; month++) {
     const days = new Date(proteinYear, month + 1, 0).getDate();
     const name = new Date(proteinYear, month, 1).toLocaleString(undefined, {month:'short'});
     rows += `<tr><th scope="row">${name}</th>`;
@@ -73,21 +73,73 @@ function renderProteinCalendar() {
   }
   return `<section class="section card protein-calendar"><div class="card-header"><h2>Protein consistency</h2><select aria-label="Protein calendar year" onchange="changeProteinYear(this.value)">${years.map(y=>`<option ${y===proteinYear?'selected':''}>${y}</option>`).join('')}</select></div><div class="card-body"><div class="protein-legend">${bands.map(([band,label])=>`<span><i class="protein-${band}"></i>${label}</span>`).join('')}</div><p class="muted">Months down, days across. Swipe to see later days; tap a square for the total.</p><div class="protein-grid-scroll" role="region" aria-label="Daily protein calendar, scroll horizontally for all days" tabindex="0"><table class="protein-grid"><caption class="sr-only">Daily protein totals for ${proteinYear}. Future and nonexistent days are blank.</caption><thead><tr><th scope="col">Month</th>${Array.from({length:31},(_,i)=>`<th scope="col">${i+1}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div><p id="protein-day-detail" class="muted" aria-live="polite">Unlogged days are separate from days below 80g. Blank spaces are future or nonexistent days.</p></div></section>`;
 }
-function setPilates(i,checked){const s=state();s.pilates[i]=checked;lsSet(STATE_KEY,s);renderPilates();}
-function resetPilates(){if(!confirm('Uncheck all 25 days and start again?'))return;const s=state();s.pilates=Array(25).fill(false);lsSet(STATE_KEY,s);renderPilates();}
+function setPilates(i,checked){
+ const s=state();
+ if(checked && !s.pilates[i]){
+   const event={id:crypto.randomUUID(),day:i+1,completedAt:new Date().toISOString(),localDate:todayStr()};
+   s.pilatesEvents.push(event);s.pilatesActive[i]=event.id;
+ }else if(!checked && s.pilates[i]){
+   const event=s.pilatesEvents.find(e=>e.id===s.pilatesActive[i]);
+   if(event)event.undoneAt=new Date().toISOString();
+   delete s.pilatesActive[i];
+ }
+ s.pilates[i]=checked;lsSet(STATE_KEY,s);renderPilates();
+}
+function resetPilates(){if(!confirm('Uncheck all 25 days and start again? Completed activity history will be kept.'))return;const s=state();s.pilates=Array(25).fill(false);s.pilatesActive={};lsSet(STATE_KEY,s);renderPilates();}
 function videoLink(i){return `https://www.youtube.com/watch?v=${PILATES[i].id}&list=PLefYzZnhersa1QOGBTcBj44GjqEd9wqyZ`;}
 function videoTitle(v){return v.title.replace(/^25 DAY PILATES CHALLENGE\s*\|?\s*DAY \d+\s*\|\s*/i,'');}
 function renderPilates(){const s=state(),done=s.pilates.filter(Boolean).length,next=s.pilates.findIndex(x=>!x);document.getElementById('pilates-content').innerHTML=header('Pilates','PILATES BY IZZY · 25 days, at your pace')+`<div class="section card"><div class="card-body"><h2>${next<0?'All 25 days complete!':'Next Up · Day '+(next+1)}</h2><p class="muted">${done}/25 complete · check or uncheck anytime</p>${next<0?'':`<a class="video-link" href="${videoLink(next)}" target="_blank" rel="noopener noreferrer">${escHtml(videoTitle(PILATES[next]))} ↗</a>`}</div></div><div class="section card">${PILATES.map((v,i)=>`<div class="pilates-row"><label class="pilates-check"><input type="checkbox" aria-label="Day ${i+1} complete" ${s.pilates[i]?'checked':''} onchange="setPilates(${i},this.checked)"></label><a href="${videoLink(i)}" target="_blank" rel="noopener noreferrer"><strong>Day ${i+1}</strong><small>${escHtml(videoTitle(v))}</small></a></div>`).join('')}</div><div class="section"><button class="btn-secondary" onclick="resetPilates()">Uncheck all & start again</button></div>`;}
+// Monday-based weeks use local calendar dates, not UTC day boundaries.
+let activityOffset=0;
+function localDateOf(timestamp){
+ const d=new Date(timestamp);
+ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function shiftDate(date,days){const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+days);return localDateOf(d);}
+function mondayOf(date){const d=new Date(date+'T12:00:00');return shiftDate(date,-((d.getDay()+6)%7));}
+function activityEntries(){
+ const s=state();
+ return [...s.sessions.map(x=>({id:x.id,type:x.workout,date:x.localDate||localDateOf(x.completedAt),label:x.workout})),...s.pilatesEvents.filter(x=>!x.undoneAt).map(x=>({id:x.id,type:'Pilates',date:x.localDate||localDateOf(x.completedAt),label:'Pilates · Day '+x.day}))];
+}
+function weekEntries(start){const end=shiftDate(start,7);return activityEntries().filter(x=>x.date>=start&&x.date<end);}
+function activityIntensity(n){return n===0?'none':n===1?'one':n===2?'two':'many';}
+function showActivityWeek(start){
+ const entries=weekEntries(start).sort((a,b)=>a.date.localeCompare(b.date));
+ document.getElementById('activity-detail').innerHTML=`<h2>Week of ${dated(start)}</h2>`+(entries.length?entries.map(x=>`<p>${dated(x.date)} · ${x.label}</p>`).join(''):'<p class="muted">No dated completions recorded this week.</p>');
+ document.getElementById('activity-detail').scrollIntoView?.({behavior:'smooth',block:'nearest'});
+}
+function moveActivity(offset){activityOffset=Math.max(0,activityOffset+offset);renderActivity();}
+function renderActivity(){
+ const current=mondayOf(todayStr());
+ const types=['PULL','PUSH','LEGS','Pilates'];
+ let rows='';let total=0;
+ for(let i=0;i<12;i++){
+   const start=shiftDate(current,-7*(activityOffset+i));const entries=weekEntries(start);total+=entries.length;
+   rows+=`<tr><th scope="row">${new Date(start+'T12:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'})}<small>${start.slice(0,4)}${start===current?' · now':''}</small></th>`+types.map(type=>{
+     const n=entries.filter(e=>e.type===type).length;
+     return `<td><button class="activity-cell activity-${activityIntensity(n)}" aria-label="Week of ${start}, ${type}: ${n} completions" onclick="showActivityWeek('${start}')">${n||'–'}</button></td>`;
+   }).join('')+'</tr>';
+ }
+ const unknown=state().pilates.filter((done,i)=>done&&!state().pilatesActive[i]).length;
+ document.getElementById('activity-content').innerHTML=header('Activity','Your week-by-week consistency')+`<section class="section card"><div class="card-body"><h2>${total} completions</h2><p class="muted">Across these 12 weeks · weeks start Monday</p><div class="activity-controls"><button onclick="moveActivity(12)">← Earlier</button><button onclick="moveActivity(-12)" ${activityOffset===0?'disabled':''}>Later →</button></div><table class="activity-grid"><thead><tr><th scope="col">Week of</th>${types.map(t=>`<th scope="col">${t==='Pilates'?t:t[0]+t.slice(1).toLowerCase()}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table><p class="muted">Each square counts completed sessions. Darker = more. Tap a week’s square for dates.</p></div></section><section class="section card"><div class="card-body" id="activity-detail" aria-live="polite"><h2>Your completed workouts</h2><p class="muted">Lift sessions appear when you finish them. Pilates appears when you check a day done. Undo removes that completion; “Uncheck all” keeps history for your next pass.</p>${unknown?`<p class="muted">${unknown} previously checked Pilates day(s) have no recorded date and aren’t assigned to a week.</p>`:''}<p class="muted">Legacy lifting checkmarks are not counted as dated sessions.</p></div></section>`;
+}
+function mergePilatesEvents(a,b){
+ const entries=new Map();
+ for(const event of [...a,...b]){const old=entries.get(event.id);entries.set(event.id,{...event,...(old?.undoneAt?{undoneAt:old.undoneAt}:{})});}
+ return [...entries.values()];
+}
 function backupKey(k){return /^(weight_|checks_|protein_|notes_)/.test(k)||['wt_history','chat_history','loaded_programs','exercise_overrides','applied_patches',STATE_KEY].includes(k);}
 function stripSecrets(value){if(Array.isArray(value))return value.map(stripSecrets);if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).filter(([k])=>!/(api.?key|token|secret|password|credential)/i.test(k)).map(([k,v])=>[k,stripSecrets(v)]));if(typeof value==='string')return value.replace(/sk-ant-[\w-]+/g,'[redacted]');return value;}
 function backupData(){return stripSecrets({_version:5,_exported:new Date().toISOString(),...Object.fromEntries(Object.keys(localStorage).filter(backupKey).map(k=>[k,lsGet(k)]))});}
 async function exportData(){const blob=new Blob([JSON.stringify(backupData(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='meg-fit-backup-'+todayStr()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);}
 function validateState(s){if(!s||s.version!==5||!Array.isArray(s.sessions)||!Array.isArray(s.pilates)||s.pilates.length!==25||!s.pilates.every(x=>typeof x==='boolean')||!s.drafts||typeof s.drafts!=='object')throw Error('Invalid workout backup');
+ if(s.pilatesEvents!==undefined&&(!Array.isArray(s.pilatesEvents)||!s.pilatesEvents.every(e=>e&&typeof e.id==='string'&&Number.isInteger(e.day)&&e.day>=1&&e.day<=25&&Number.isFinite(Date.parse(e.completedAt))&&(!e.localDate||/^\d{4}-\d{2}-\d{2}$/.test(e.localDate))&&(!e.undoneAt||Number.isFinite(Date.parse(e.undoneAt))))))throw Error('Invalid Pilates activity');
+ if(s.pilatesActive!==undefined&&(!s.pilatesActive||typeof s.pilatesActive!=='object'||Array.isArray(s.pilatesActive)||!Object.entries(s.pilatesActive).every(([day,id])=>Number.isInteger(Number(day))&&Number(day)>=0&&Number(day)<25&&typeof id==='string')))throw Error('Invalid Pilates checklist history');
  for(const x of s.sessions){if(typeof x.id!=='string'||!PLAN[x.workout]||!Number.isFinite(Date.parse(x.completedAt))||!Array.isArray(x.exercises))throw Error('Invalid session');for(const e of x.exercises)if(!CURRENT[e.id]||(e.weight!==null&&(typeof e.weight!=='number'||!Number.isFinite(e.weight)||e.weight<0)))throw Error('Invalid session weight');}
  for(const [k,d]of Object.entries(s.drafts)){if(!PLAN[k]||typeof d.id!=='string'||!Array.isArray(d.checks)||!d.checks.every(id=>PLAN[k].exercises.some(e=>e[0]===id))||!d.weights||typeof d.weights!=='object')throw Error('Invalid unfinished workout');}
 }
 function unique(a,b){return [...new Map([...a,...b].map(x=>[JSON.stringify(x),x])).values()];}
-function prepareRestore(data){if(!data||typeof data!=='object'||Array.isArray(data)||![2,5].includes(data._version))throw Error('Choose a Meg’s Fit backup (version 2 or 5).');const writes={};for(const [k,v]of Object.entries(data)){if(!backupKey(k))continue;if(k===STATE_KEY){validateState(v);const current=state();const sessions=new Map(v.sessions.map(x=>[x.id,x]));current.sessions.forEach(x=>sessions.set(x.id,x));writes[k]={version:5,sessions:[...sessions.values()].sort((a,b)=>a.completedAt.localeCompare(b.completedAt)),drafts:{...v.drafts,...current.drafts},pilates:current.pilates.map((x,i)=>x||v.pilates[i])};for(const [key,d]of Object.entries(writes[k].drafts))if(sessions.has(d.id))delete writes[k].drafts[key];continue;}
+function prepareRestore(data){if(!data||typeof data!=='object'||Array.isArray(data)||![2,5].includes(data._version))throw Error('Choose a Meg’s Fit backup (version 2 or 5).');const writes={};for(const [k,v]of Object.entries(data)){if(!backupKey(k))continue;if(k===STATE_KEY){validateState(v);const current=state();const sessions=new Map(v.sessions.map(x=>[x.id,x]));current.sessions.forEach(x=>sessions.set(x.id,x));writes[k]={version:5,pilatesEvents:mergePilatesEvents(v.pilatesEvents||[],current.pilatesEvents),pilatesActive:{...(v.pilatesActive||{}),...current.pilatesActive},sessions:[...sessions.values()].sort((a,b)=>a.completedAt.localeCompare(b.completedAt)),drafts:{...v.drafts,...current.drafts},pilates:current.pilates.map((x,i)=>x||v.pilates[i])};for(const [day,id] of Object.entries(writes[k].pilatesActive)){if(writes[k].pilatesEvents.some(e=>e.id===id&&e.undoneAt)){writes[k].pilates[day]=false;delete writes[k].pilatesActive[day];}}for(const [key,d]of Object.entries(writes[k].drafts))if(sessions.has(d.id))delete writes[k].drafts[key];continue;}
  if(k.startsWith('weight_')&&(!v||typeof v!=='object'||!['string','number'].includes(typeof v.weight)))throw Error('Invalid legacy weight');
  if(k==='chat_history'&&!v?.every?.(m=>m&&['user','assistant'].includes(m.role)&&typeof m.content==='string'))throw Error('Invalid chat history');
  if(k==='wt_history'&&(!v||typeof v!=='object'||Array.isArray(v)||!Object.values(v).every(Array.isArray)))throw Error('Invalid legacy history');
